@@ -24,7 +24,7 @@ int main(){
 
     FILE *dat1;
 
-    dat1=fopen("datoteka243.txt","r");
+    dat1=fopen("datoteka1.txt","r");
 
     if((dat1==NULL)){
         printf("Greska pri ucitavanju datoteka!!!");                       /*provjera otvaranja datoteke*/
