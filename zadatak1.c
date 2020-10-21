@@ -20,7 +20,7 @@ int main(){
 
     FILE *dat1;
 
-    dat1=fopen("datoteka1.txt","r");
+    dat1=fopen("datoteka243.txt","r");
 
     if((dat1==NULL)){
         printf("Greska pri ucitavanju datoteka!!!");                       /*provjera otvaranja datoteke*/
@@ -39,16 +39,14 @@ int main(){
     for(i=0;i<br;i++){
         fscanf(dat1," %s %s %d", s[i].ime, s[i].prezime, &s[i].bodovi);    /*prijepis iz datoteke u strukturu*/
     }
-
-    printf("\n\n%d\n\n", br);
-
+    
     for(i=0;i<br;i++){
         printf("%d. student: \n", i+1);                                                 /*ispis*/
         printf("Ime i prezime: %s %s \n", s[i].ime, s[i].prezime);                      
-        printf("Broj ostvarenih bodova: %d  \n", s[i].bodovi);
+        printf("Broj ostvarenih bodova: %d  \n", s[i].bodovi);                     
+        rel=(float)s[i].bodovi*100/MAX;
         printf("Broj relativnih bodova: %.2f \n\n\n", rel);
     }
-    
     fclose(dat1);                                                                       /*zatvaranje datoteke*/
 
 return 0;
