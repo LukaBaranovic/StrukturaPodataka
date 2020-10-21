@@ -17,7 +17,7 @@ int main(){
 
     student *s;
 
-    int i,j,n,br;                                                           /*   par varijabli koje mi mozda zatrebaju, a mozda ne */
+    int i,j,n,br;                                                          /*   par varijabli koje mi mozda zatrebaju, a mozda ne */
     br=0;
     char tmp;
     double rel;
@@ -36,12 +36,12 @@ int main(){
         }
         }
 
-    rewind(dat1);                                                          /*vraca se na pocetak datoteke */
+    rewind(dat1);                                                           /*vraca se na pocetak datoteke */
 
-    s=(student *)malloc(br * sizeof(student));                             /* dinamicka alokacija strukture */
+    s=(student *)malloc(br * sizeof(student));                              /* dinamicka alokacija strukture */
 
     for(i=0;i<br;i++){
-        fscanf(dat1," %s %s %d", s[i].ime, s[i].prezime, &s[i].bodovi);    /*prijepis iz datoteke u strukturu*/
+        fscanf(dat1," %s %s %d", s[i].ime, s[i].prezime, &s[i].bodovi);     /*prijepis iz datoteke u strukturu*/
     }
 
     printf("\n\n%d\n\n", br);
@@ -49,19 +49,12 @@ int main(){
     for(i=0;i<br;i++){
         printf("%d. student: \n", i+1);                                                 /*ispis*/
         printf("Ime i prezime: %s %s \n", s[i].ime, s[i].prezime);                      /*stavio sam da je broj bodova 100 jer nije zadano i nije mi bilo*/
-        printf("Broj ostvarenih bodova: %d  \n", s[i].bodovi);                      /*jasno sta da stavim pod relativne bodove*/
+        printf("Broj ostvarenih bodova: %d  \n", s[i].bodovi);                          /*jasno sta da stavim pod relativne bodove*/
         rel=(float)s[i].bodovi*100/MAX;
         printf("Broj relativnih bodova: %.2f \n\n\n", rel);
     }
 
-
     fclose(dat1);                                                                       /*zatvaranje datoteke*/
-
 
 return 0;
 }
-
-
-
-
-
