@@ -18,23 +18,23 @@ position create_student();
 void insert_first(position);
 void show(position);
 void insert_last(position);
-void search_by_last_name(position, char []);
+position search_by_last_name_prev(position);
+position search_by_last_name(position);
+
+void delete_from_list(position);
 
 int main() {
 	position head = NULL;
 	head = (position)malloc(sizeof(struct student));
 	head->next = NULL;
 
-	char last_name[MAX];
+	  
+	insert_first(head);
+	insert_last(head);	  
 
-	insert_first(head);  
-	insert_last(head);	  show(head->next);
+	delete_from_list(head);
 
-	printf("Insert last name to search for: ");
-	scanf(" %s", &last_name);
-
-
-	search_by_last_name(head->next, last_name);
+	show(head);
 
 
 
@@ -67,8 +67,7 @@ void insert_first(position head) {
 }
 
 void show(position head) {
-	if (head == NULL)
-		printf("Failed loading: \n");
+	head = head->next;
 
 	while (head != NULL) {
 		printf("\nFirst name: %s \n", head->first_name);
@@ -79,7 +78,6 @@ void show(position head) {
 	}
 }
 
-
 void insert_last(position head) {
 	
 	while (head->next != NULL) {
@@ -89,18 +87,59 @@ void insert_last(position head) {
 	insert_first(head);
 }
 
-void search_by_last_name(position head,char last_name[MAX]) {
-	if (head == NULL) 
+position search_by_last_name_prev(position head) {
+	if (head->next == NULL) 
 		printf("failed to find by last name");
+	
+	int br = NULL;
+	char last_name[MAX];
+	printf("Insert last name:  ");
+	scanf(" %s", last_name);
 
-	while (head != NULL) {
-		if (strcmp (last_name ,head->last_name) != 0) {
-			printf("The student with this last name is:  \n");
-			show(head);
+	while (head->next != NULL) {
+		if (strcmp (last_name ,head->next->last_name) == 0) {
+			// printf("The student with this last name is:  \n");
+			// printf(" %s %s", head->next->first_name, head->next->last_name);
+			return head;
 		}
+
 		head = head->next;
 	}
 
-	if (head == NULL)
+	if (br == NULL)
 		printf("No student with such last name in list. \n");
+}
+
+position search_by_last_name(position head) {
+	if (head->next == NULL)
+		printf("failed to find by last name");
+
+	int br = NULL;
+	char last_name[MAX];
+	printf("Insert last name:  ");
+	scanf(" %s", last_name);
+
+	while (head->next != NULL) {
+		if (strcmp(last_name, head->next->last_name) == 0) {
+			// printf("The student with this last name is:  \n");
+			// printf(" %s %s", head->next->first_name, head->next->last_name);
+			return head->next;
+		}
+
+		head = head->next;
+	}
+
+	if (br == NULL)
+		printf("No student with such last name in list. \n");
+}
+
+void delete_from_list(position head) {
+
+	position prev;
+	prev = (position)malloc(sizeof(struct student));
+	prev = search_by_last_name_prev(head);
+	
+	head = prev->next;
+	prev->next = head->next;
+	free(head);	
 }
