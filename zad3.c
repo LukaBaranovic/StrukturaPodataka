@@ -28,6 +28,9 @@ int line_counter(FILE*);
 position read_from_file(FILE*, position head);
 position insert_from_file(char[MAX],char[MAX],int,position);
 void print_to_file(FILE*, position);
+void insert_before(position);
+void insert_after(position);
+void sort_by_last_name(position);
 
 
 int main() {
@@ -41,10 +44,11 @@ int main() {
 	if ((file_1 == NULL) || (file_2 == NULL))
 		printf("File failed to load... \n");
 
-	
+
 	read_from_file(file_1, head);
 	show(head);
-
+	sort_by_last_name(head);
+	show(head);
 	print_to_file(file_2, head);
 
 
@@ -207,4 +211,57 @@ void print_to_file(FILE* f, position head) {
 		fprintf(f,"First, last name and birth year: %s %s %d \n",head->first_name,head->last_name,head->year_date);
 		head = head->next;
 	}
+}
+
+void insert_before(position head) {
+	printf("After which student do you want to add a new one? \n");
+	head = search_by_last_name_prev(head);
+
+	position tmp = (position)malloc(sizeof(struct student));
+	tmp = create_student();
+
+	tmp->next = head->next;
+	head->next = tmp;
+}
+
+void insert_after(position head) {
+	printf("After which student do you want to add a new one? \n");
+	head = search_by_last_name(head);
+
+	position tmp = (position)malloc(sizeof(struct student));
+	tmp = create_student();
+
+	tmp->next = head->next;
+	head->next = tmp;
+}
+
+void sort_by_last_name(position head) {
+	position tmp = (position)malloc(sizeof(struct student));
+	position start, tester;
+	int x = 1;
+
+	while (x == 1) {
+		x = 0;
+		start = head;
+
+		while (start->next->next != NULL) {
+			start = start->next;
+			if (strcmp(start->last_name, start->next->last_name) > 0) {
+				x = 1;
+
+				strcpy(tmp->first_name, start->first_name);
+				strcpy(tmp->last_name, start->last_name);
+				tmp->year_date = start->year_date;
+
+				strcpy(start->first_name, start->next->first_name);
+				strcpy(start->last_name, start->next->last_name);
+				start->year_date = start->next->year_date;
+
+				strcpy(start->next->first_name, tmp->first_name);
+				strcpy(start->next->last_name, tmp->last_name);
+				start->next->year_date = tmp->year_date;
+			}
+		}	
+	}
+	free(tmp);
 }
