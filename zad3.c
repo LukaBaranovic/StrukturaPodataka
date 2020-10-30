@@ -34,6 +34,8 @@ void sort_by_last_name(position);
 
 
 int main() {
+	int loop = 1;
+	int action;
 	position head = NULL;
 	head = (position)malloc(sizeof(struct student));
 	head->next = NULL;
@@ -44,15 +46,54 @@ int main() {
 	if ((file_1 == NULL) || (file_2 == NULL))
 		printf("File failed to load... \n");
 
+	printf("Insert first         - 1 \n");
+	printf("Insert last          - 2 \n");
+	printf("Insert before        - 3 \n");
+	printf("Insert after         - 4 \n");
+	printf("Delete               - 5 \n");
+	printf("Read from file       - 6 \n");
+	printf("Sort                 - 7 \n");
+	printf("Show                 - 8 \n");
+	printf("Print to file        - 9 \n");
+	printf("Exit program         - 0 \n");
 
-	read_from_file(file_1, head);
-	show(head);
-	sort_by_last_name(head);
-	show(head);
-	print_to_file(file_2, head);
+	while (loop == 1) {
+		printf("Chose an action: ");
+		scanf(" %d", &action);
 
-
-
+		switch (action) {
+		case 1:
+			insert_first(head);
+			break;
+		case 2:
+			insert_last(head);
+			break;
+		case 3:
+			insert_before(head);
+			break;
+		case 4:
+			insert_after(head);
+			break;
+		case 5:
+			delete_from_list(head);
+			break;
+		case 6:
+			read_from_file(file_1, head);
+			break;
+		case 7:
+			sort_by_last_name(head);
+			break;
+		case 8:
+			show(head);
+			break;
+		case 9:
+			print_to_file(file_2, head);
+			break;
+		case 0:
+			loop = 0;
+			break;
+		}
+	}
 
 	fclose(file_1);
 	fclose(file_2);
@@ -112,13 +153,11 @@ position search_by_last_name_prev(position head) {
 	
 	int br = NULL;
 	char last_name[MAX];
-	printf("Insert last name:  ");
+	printf("Insert last to search for:  ");
 	scanf(" %s", last_name);
 
 	while (head->next != NULL) {
 		if (strcmp (last_name ,head->next->last_name) == 0) {
-			// printf("The student with this last name is:  \n");
-			// printf(" %s %s", head->next->first_name, head->next->last_name);
 			return head;
 		}
 
@@ -135,13 +174,11 @@ position search_by_last_name(position head) {
 
 	int br = NULL;
 	char last_name[MAX];
-	printf("Insert last name:  ");
+	printf("Insert last name to search for:  ");
 	scanf(" %s", last_name);
 
 	while (head->next != NULL) {
 		if (strcmp(last_name, head->next->last_name) == 0) {
-			// printf("The student with this last name is:  \n");
-			// printf(" %s %s", head->next->first_name, head->next->last_name);
 			return head->next;
 		}
 
@@ -214,7 +251,7 @@ void print_to_file(FILE* f, position head) {
 }
 
 void insert_before(position head) {
-	printf("After which student do you want to add a new one? \n");
+	printf("Before which student do you want to add a new one? \n");
 	head = search_by_last_name_prev(head);
 
 	position tmp = (position)malloc(sizeof(struct student));
@@ -236,6 +273,7 @@ void insert_after(position head) {
 }
 
 void sort_by_last_name(position head) {
+
 	position tmp = (position)malloc(sizeof(struct student));
 	position start, tester;
 	int x = 1;
