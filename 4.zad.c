@@ -1,3 +1,7 @@
+/* 4. zadatak -trenutno samo za ispis iz datoteke i sortirani upis u listu */
+
+
+
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,39 +15,35 @@ struct polynom {
 };
 
 int line_counter(FILE*);
-void read_from_file(FILE*, int, position *);
-void insert_to_list(int, int, position);
-void show(int, position *);
 position create_list(int);
-void polynom_sum(position* head, int);
+void read_from_file(FILE *, position*, int);
+void sorted_insert(int,int,position);
+void show(int, position *);
+void polynom_sum(int ,position);
 
 int main() {
 	int i, j, n;
 	FILE* file_1;
-	file_1 = fopen("4zadatak.txt", "r");
+	file_1 = fopen("kraj4zad.txt", "r");
 	if (file_1 == NULL)
 		printf("file reading eror...\n");
 	int number_of_polynom = line_counter(file_1);
 
 	position* head = create_list(number_of_polynom);
 
-
-	read_from_file(file_1, number_of_polynom, head);
-
-	show(number_of_polynom , head);
-
-	polynom_sum(number_of_polynom, head);
+	read_from_file(file_1, head, number_of_polynom);
 
 	show(number_of_polynom, head);
 
 
-
-
-	
-
-
-	fclose(file_1);
+	system("pause");
 }
+
+
+
+
+
+
 
 
 int line_counter(FILE* f) {
@@ -54,55 +54,7 @@ int line_counter(FILE* f) {
 			counter = counter + 1;
 	}
 	rewind(f);
-	return counter;
-}
-
-void read_from_file(FILE* f, int n, position *head) {
-	int i = 0,val,e;
-
-	for (i = 0; i < n; i++) {
-		fscanf(f, "%d %d", &val, &e);
-		insert_to_list(val, e, head[i]);
-		fscanf(f, "%d %d", &val, &e);
-		insert_to_list(val, e, head[i]);
-	}
-	
-
-
-}
-
-void insert_to_list(int val, int e, position head) {
-	position tmp = NULL;
-	tmp = (position)malloc(sizeof(struct polynom));
-	tmp->next = NULL;
-
-	tmp->value = val;
-	tmp->exponent = e;
-
-	tmp->next = head->next;
-	head->next = tmp;
-}
-
-void show(int n, position *head) {
-	int i;
-	position tmp = (position)malloc(sizeof(struct polynom));
-	tmp->next = NULL;
-
-	for (i = 0; i < n + 2; i++) {
-		tmp = head[i];
-
-		if (tmp->next != 0) {
-			printf("%d. polinom: ", i + 1);
-		}
-
-		while (tmp->next != NULL) {
-			tmp = tmp->next;
-			printf(" %d^(%d) ",tmp->value, tmp->exponent);
-		}
-		printf(" \n");
-		
-	}
-
+	return counter+1;
 }
 
 position create_list(int n) {
@@ -118,18 +70,74 @@ position create_list(int n) {
 	return head;
 }
 
-void polynom_sum(position *head,int n) {
-	position tmp = (position)malloc(sizeof(struct polynom));
-	tmp->next = NULL;
-	int i;
+void read_from_file(FILE *f, position *head, int n) {
 
-	
+	int i, j,val,exp, mat[2];
+	int enter = 0;
+	int space = 1;
+	char c;
+
+	while (!feof(f)) {
+		c = getc(f);
+
+		if (c == '\n') {
+			mat[enter] = space / 2;
+			space = 1;
+			enter = enter + 1;
+		}
+		if (c == ' ')
+			space = space + 1;
+
+	}
+	mat[enter] = space / 2;
+	rewind(f);
+
 	for (i = 0; i < n; i++) {
-		tmp = head[i];
-		tmp = tmp->next;
-
-		while (tmp != NULL) {
-			insert_to_list(tmp->value, tmp->exponent, head[n]);
+		for (j = 0; j < mat[i]; j++) {
+			fscanf(f, "%d %d", &val, &exp);
+			sorted_insert(val ,exp, head[i]);
 		}
 	}
+
+
 }
+
+void sorted_insert(int val, int exp, position head) {
+	position tmp;
+	tmp = (position)malloc(sizeof(struct polynom));
+	tmp->next = NULL;
+
+	
+	while ((head->next != NULL) && (exp < head->next->exponent))
+		head = head->next;
+
+	tmp->value = val;
+	tmp->exponent = exp;
+
+	tmp->next = head->next;
+	head->next = tmp;
+}
+
+void show(int n, position* head) {
+	int i;
+	position tmp;
+
+	for(i=0;i<n;i++){
+		printf("%d. polinom: ", i + 1);
+		tmp = head[i];
+		while (tmp->next != NULL) {
+			tmp = tmp->next;
+			
+			if (tmp->exponent > 1) 
+				printf(" %dx^(%d) ", tmp->value, tmp->exponent);
+			if (tmp->exponent == 1) 
+				printf(" %dx ", tmp->value);
+			if (tmp->exponent == 0) 
+				printf(" %d ", tmp->value);
+			
+		}
+		printf("\n");
+	}
+}
+
+
