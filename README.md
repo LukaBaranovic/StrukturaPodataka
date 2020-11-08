@@ -1,0 +1,2 @@
+# StrukturaPodataka
+Laboratorijske vjezbe
