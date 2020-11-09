@@ -4,7 +4,9 @@ Napisati program za zbrajanje i množenje polinoma. Koeficijenti i eksponenti se
 U program se polinomi ne unose rucno vec preko datoteke. Kada radimo datoteku izmedu baze i exponenta
 stavljama razmak kojeg takoder stavljamo izmedu dva clana. Za novi polinom predemo u novi red.
 
-Mi samo biramo ako ima vise polinoma koja dva cemo zbrojit/pomnozit.
+Kada program, on nam ispisuje sve polinome koji su nam dostupni za operacije zbrajanja i mnozenja.
+Kada izaberemo koju operaciju zelimo izvrsiti program nas pita koja 2 polinoma zelimo zbrojiti/pomnoziti,
+a ako izaberemo polinome koji ne postoje program nam to kaze i vrati nas na pocetak programa.
 */
 
 
@@ -27,7 +29,7 @@ void sorted_insert(int,int,position);
 void show(int, position *);
 position polynom_sum (position,position);
 position polynom_multiply(position, position);
-void sort_double(position);                                         //kako pri mnozenju mozemo dobiti 2 polinoma sa istim exponentima ova funkcija to popravlja
+void sort_double(position);                      
 void show_specific(position);
 
 
@@ -63,26 +65,34 @@ int main() {
 			show(number_of_polynom, head);
 			break;
 		case 2:
-			printf("Unesite koje polinome zelite zbrojiti od njih %d?  \n", number_of_polynom);
+			printf("Unesite koje polinome zelite zbrojiti?  ");
+			for (i = 0; i < number_of_polynom; i++) {
+				printf(" (%d)", i + 1);
+			}
+			printf("\n");
 			scanf(" %d %d", &first, &second);
 			if (first > 0 && second > 0 && first < number_of_polynom + 1 && second < number_of_polynom + 1) {
 				printf("Zbroj %d. i %d. polinoma:  ", first, second);
 				show_specific(polynom_sum(head[first - 1], head[second - 1]));
 			}
 			else
-				printf("Takvi polinomi ne postoje, pokusajte ponovno");
+				printf("Takvi polinomi ne postoje, pokusajte ponovno...\n");
 			first = NULL;
 			second = NULL;
 			break;
 		case 3:
-			printf("Unesite koje polinome zelite pomnoziti od njih %d?  \n", number_of_polynom);
+			printf("Unesite koje polinome zelite pomnoziti? ");
+			for (i = 0; i < number_of_polynom; i++) {
+				printf(" (%d)", i + 1);
+			}
+			printf("\n");
 			scanf(" %d %d", &first, &second);
 			if (first > 0 && second > 0 && first < number_of_polynom + 1 && second < number_of_polynom + 1) {
 				printf("Umnozak %d. i %d. polinoma:  ", first, second);
 				show_specific(polynom_multiply(head[first - 1], head[second - 1]));
 			}
 			else
-				printf("Takvi polinomi ne postoje, pokusajte ponovno");
+				printf("Takvi polinomi ne postoje, pokusajte ponovno...\n");
 			first = NULL;
 			second = NULL;
 			break;
@@ -106,7 +116,7 @@ int main() {
 
 
 int line_counter(FILE* f) {
-	int counter = 0;								//zbraja linije da znamo koliko polinoma imamo
+	int counter = 0;												
 
 	while (!feof(f)) {
 		if (getc(f) == '\n')
@@ -115,6 +125,8 @@ int line_counter(FILE* f) {
 	rewind(f);
 	return counter+1;
 }
+
+/* funckija koja broji linije iz file-a, odnosno broj polinoma datoteke*/
 
 position create_list(int n) {								//kreira niz u kojoj je svaki clan vezana lista
 	int i;										//kreira onoliko koliko zelimo polioma unijeti
@@ -127,6 +139,9 @@ position create_list(int n) {								//kreira niz u kojoj je svaki clan vezana l
 	}
 	return head;
 }
+
+/* Kreira niz od onoliko clanova koliko je u datoteci upisano.
+   Svaki clan niza je vezana lista.  */
 
 void read_from_file(FILE *f, position *head, int n) {
 	int i, j, val, exp;
@@ -158,6 +173,8 @@ void read_from_file(FILE *f, position *head, int n) {
 	}
 }
 
+/* Funkcija koja cita polinome iz datoteke i upisuje ih u vezanu listu. */
+
 void sorted_insert(int val, int exp, position head) {						//sortira unos od prema padajucim vrijednostima
 	position tmp;										//podrazumijeva se da se exponenti u istom polinomu ne ponavljaju
 	tmp = (position)malloc(sizeof(struct polynom));
@@ -172,6 +189,8 @@ void sorted_insert(int val, int exp, position head) {						//sortira unos od pre
 	tmp->next = head->next;
 	head->next = tmp;
 }
+
+/* Funkcija koja sortira polinome, od clana s najvecin koeficijentom do clana sa najmanjim. */
 
 void show(int n, position* head) {								//ispisuje polinome na 3 nacina:
 	int i;											// x=0 ne prikazuje x nego samo ispise njegovu vrijednost
@@ -196,6 +215,8 @@ void show(int n, position* head) {								//ispisuje polinome na 3 nacina:
 	
 }
 
+/* Funkcija koja prikazuje sve polinome ucitane iz datoteke.  */
+
 void show_specific(position head) {
 	position tmp = head;
 
@@ -212,6 +233,8 @@ void show_specific(position head) {
 	printf("\n");
 }
 
+/* Funkcija koja prikazuje specificni polinom. Koristi se za ispis zbroja/umnoska. */
+
 position polynom_sum(position pol1, position pol2) {
 	int i, j;
 	position pol_sum = (position)malloc(sizeof(struct polynom));
@@ -222,10 +245,10 @@ position polynom_sum(position pol1, position pol2) {
 	pol2 = pol2->next;
 
 	while ((pol1 != NULL) && (pol2 != NULL)) {
-		if (pol1->exponent == pol2->exponent) {									//trazi clanove sa istim exponentom
+		if (pol1->exponent == pol2->exponent) {							//trazi clanove sa istim exponentom
 			val = pol1->value + pol2->value;
 			exp = pol1->exponent;
-			if(val != 0)											//ako je njihov zbroj 0 samo ga zanemari
+			if(val != 0)									//ako je njihov zbroj 0 samo ga zanemari
 				sorted_insert(val, exp, pol_sum);
 			pol1 = pol1->next;
 			pol2 = pol2->next;
@@ -240,7 +263,7 @@ position polynom_sum(position pol1, position pol2) {
 		}
 	}
 
-	while (pol1 != NULL) {											//kad jedan polinom dodje do 0, drugog prepise dokraja
+	while (pol1 != NULL) {										//kad jedan polinom dodje do 0, drugog prepise dokraja
 		sorted_insert(pol1->value, pol1->exponent, pol_sum);
 		pol1 = pol1->next;
 	}
@@ -251,6 +274,8 @@ position polynom_sum(position pol1, position pol2) {
 
 return pol_sum;												//vraca sorirani zbroj kojeg dobijemo u main funkciji
 }
+
+/* Funkcija koja vraca sortiranu sumu dvaju polinoma koja mi posaljemo. */
 
 position polynom_multiply(position pol1, position pol2) {
 	position result = (position)malloc(sizeof(struct polynom));
@@ -271,6 +296,8 @@ position polynom_multiply(position pol1, position pol2) {
 return result;
 }
 
+/* Funkcija koja vraca sortirani umnozak dvaju polinoma koja mi posaljemo. */
+
 void sort_double(position head) {
 	position tmp = (position)malloc(sizeof(struct polynom));
 	tmp->next = NULL;
@@ -290,3 +317,5 @@ void sort_double(position head) {
 		}
 	}
 }
+
+/* Funkcija koja trazi duple polinome nakon funkcije polynom_multiply i spaja u jedno. */
