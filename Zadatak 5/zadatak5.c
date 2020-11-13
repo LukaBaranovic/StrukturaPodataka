@@ -24,15 +24,60 @@ void make_intersection(position, position);
 
 int main() {
 	int number = line_counter();
+	int action, loop = 1;
+	int first = 0, second = 0;
 	position* head = create_list(number);
 	read_from_file(head);
 
-
 	show_all_from_file(number, head);
-	make_union(head[0], head[1]);
-	make_intersection(head[0], head[1]);
+	
+	printf(" (1) -prikazi uniju 2 skupa \n");
+	printf(" (2) -prikazi presjek 2 skupa \n");
+	printf(" (0) -izlaz iz programa \n");
+		
+	while (loop == 1) {
+		printf("Unesite radnju: \n");
+		scanf(" %d", &action);
 
+		switch (action) {
+		case 1:
+			printf("Izaberi prvi skup za uniju: ");
+			scanf(" %d", &first);
+			printf("Izaberi drugi skup za uniju: ");
+			scanf(" %d", &second);
+			if (first > 0 && first < number + 1 && second > 0 && second < number + 1) {
+				printf("Unija %d. i %d. skupa je: ", first, second);
+				make_union(head[first - 1], head[second - 1]);
+			}
+			else
+				printf("Ti skupovi ne postoje...\n");
+			break;
+		case 2:
+			printf("Izaberi prvi skup za presjek: ");
+			scanf(" %d", &first);
+			printf("Izaberi drugi skup za presjek: ");
+			scanf(" %d", &second);
+			if (first > 0 && first < number + 1 && second > 0 && second < number + 1) {
+				printf("Presjek %d. i %d. skupa je: ", first, second);
+				make_intersection(head[first - 1], head[second - 1]);
+			}
+			else
+				printf("Ti skupovi ne postoje...\n");
+			break;
+		case 0:
+			loop = 0;
+			break;
+		default:
+			break;
+		}
+
+	}
+
+
+	system("pause");
 }
+
+
 
 position create_list(int number) {
 	int i;
@@ -65,7 +110,7 @@ void read_from_file(position* head) {
 
 void insert(char* str, position head) {
 	int br = 0, differ = 0;
-	
+
 	while (sscanf(str, " %d, %n%*[^\n]", &br, &differ) == 1) {
 		str = str + differ;
 		sorted_insert(br, head);
@@ -99,7 +144,7 @@ void show_specific(position head) {
 void show_all_from_file(int number, position* head) {
 	int i;
 	for (i = 0; i < number; i++) {
-		printf("%d. linija: ", i + 1);
+		printf("%d. skup: ", i + 1);
 		show_specific(head[i]);
 	}
 }
