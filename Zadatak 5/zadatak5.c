@@ -189,7 +189,6 @@ void make_union(position list1, position list2) {
 		list2 = list2->next;
 		sorted_insert(list2->x, list_union);
 	}
-	printf("Unija je: ");
 	show_specific(list_union);
 }
 
@@ -210,6 +209,5 @@ void make_intersection(position list1, position list2) {
 			list2 = list2->next;
 		}
 	}
-	printf("Presjek je:");
 	show_specific(list_intersection);
 }
