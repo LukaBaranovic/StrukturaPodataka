@@ -3,34 +3,41 @@
 #include <stdlib.h>
 #include<malloc.h>
 
-typedef struct stog *position;
+typedef struct stog *position1;
 struct stog {
 	int x;
-	position next;
+	position1 next;
 };
 
-void push(position);
-void pop(position);
+typedef struct red *position2;
+struct red {
+	int x;
+	position2 next;
+};
+
+void push(position1);
+void pop(position1);
 
 
 int main() {
-	position head = NULL;
-	head = (position)malloc(sizeof(struct stog));
-	int action, loop=1;
+	position1 head_stog = NULL;
+	head_stog = (position1)malloc(sizeof(struct stog));
+	head_stog->next = NULL;
+	int action, loop = 1;
 	printf("Unesite radnju: \n");
 	printf("(1) Push \n");
 	printf("(2) Pop  \n");
-	
+
 
 	while (loop == 1) {
 		scanf(" %d", &action);
 		switch (action) {
 		case 1:
-			push(head);
+			push(head_stog);
 			break;
 
 		case 2:
-			pop(head);
+			pop(head_stog);
 			break;
 
 		default:
@@ -42,13 +49,13 @@ int main() {
 
 }
 
-void push(position head) {
-	position tmp = NULL;
-	tmp = (position)malloc(sizeof(struct stog));
+void push(position1 head) {
+	position1 tmp = NULL;
+	tmp = (position1)malloc(sizeof(struct stog));
 	int upper = 100, lower = 10;
 
-	int num = (rand() % (upper - lower + 1)) + lower; 
-        printf("Push broj: %d \n", num); 
+	int num = (rand() % (upper - lower + 1)) + lower;
+	printf("Push broj: %d \n", num);
 
 	tmp->x = num;
 
@@ -56,10 +63,10 @@ void push(position head) {
 	head->next = tmp;
 }
 
-void pop(position head) {
+void pop(position1 head) {
 	if (NULL != head->next) {
 
-		position tmp;
+		position1 tmp;
 		tmp = head->next;
 		head->next = tmp->next;
 
