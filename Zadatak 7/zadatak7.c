@@ -26,7 +26,7 @@ void insert_as_integer(position,int);
 void insert_as_char(position, char[]);
 void calculate(position, char);
 void display(position);
-
+ 
 
 int main() {
 	position postfix = read_from_file();
