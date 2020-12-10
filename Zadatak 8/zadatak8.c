@@ -1,117 +1,90 @@
+/*
+Trentuno u radu.
+Funkcije:
+-napravi direktorij
+-napravi poddirektorij
+-ispisi direktorije
+-ispisi poddirektorije
+*/
+
+
+
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #define BUFFER 256
 
-typedef struct directory* position;
+typedef struct Node* position;
 
-struct directory {
-	char name[BUFFER];
-	position next_child;
-	position prev_child;
+struct Node {
+	int data;
 	position next_brother;
-	position prev_brother;
+	position next_child;
 };
 
+position create_root(int);
 void append_brother(position);
 void display_brother(position);
 int count_brother(position);
 
-void chose_directory(position);
 void create_child(position);
-void display_child(position);
-
-
+void enter_child(position);
 
 int main() {
-	position tree = (position)malloc(sizeof(struct directory));
-	tree->next_child = NULL;
-	tree->next_brother = NULL;
-	int loop = 1;
-	int action;
+	position directory = create_root(0);
+	create_child(directory);
+	enter_child(directory);
+
+}
 
 
 
-	printf("Unesite prvi direktorij: \n");
-	append_brother(tree);
 
 
-	printf("Unesite radnju: \n");
-	printf("(1) Unesite direktorij \n");
-	printf("(2) Prikazite direktorije \n");
-	printf("(3) Prikazite poddirektorije \n");
-	printf("(4) Unesi poddirektorij");
-	printf("(0) Izlaz iz programa\n");
 
-	while (loop == 1) {
-		scanf(" %d", &action);
 
-		switch (action) {
-		case 1:
-			append_brother(tree);
-			break;
-		case 2:
-			display_brother(tree);
-			break;
-		case 4:
-			chose_directory(tree);
-			break;
-		case 0:
-			loop = 0;
-			break;
-		default:
-			printf("Nepostojeca akcija!! \n\n");
-			break;
-		}
+position create_root(int x) {
+	position head = (position)malloc(sizeof(struct Node));
+	head->next_brother = NULL;
+	head->next_child = NULL;
+	position tmp = (position)malloc(sizeof(struct Node));
+	tmp->next_brother = NULL;
+	tmp->next_child = NULL;
 
+	if (x == 0) {
+		printf("Unesite direktorij: ");
+	}
+	if (x == 1) {
+		printf("Unesite poddirektorij: ");
 	}
 
-
-	display_child(tree);
-
-
-
+	scanf(" %d", &tmp->data);
+	head->next_brother = tmp;
+	return head;
 }
 
 
 void append_brother(position head) {
-	position tmp = (position)malloc(sizeof(struct directory));
+	position tmp = (position)malloc(sizeof(struct Node));
 	tmp->next_brother = NULL;
 	tmp->next_child = NULL;
-	int loop = 1;
 
-	printf("Unesite ime za direktorij:  ");
-	scanf(" %[^\n]", tmp->name);
+	printf("Unesite direktorij: ");
+	scanf(" %d", &tmp->data);
 
-	
-	while (head->next_brother != NULL && loop == 1) {
-		if (strcmp(tmp->name, head->next_brother->name) > 0)
-			head = head->next_brother;
-		else
-			loop = 0;
-	}
-	
-
-	if (head->next_brother != NULL) {
-		tmp->next_brother = head->next_brother;
-		tmp->next_brother->prev_brother = tmp;
-		tmp->prev_brother = head;
-		head->next_brother = tmp;
-	}
-	else {
-		head->next_brother = tmp;
-		tmp->prev_brother = head;
-	}
+	tmp->next_brother = head->next_brother;
+	head->next_brother = tmp;
 }
-
 
 void display_brother(position head) {
 	position tmp = head;
 	int counter = 1;
-	while (tmp->next_brother != NULL) {
+
+	tmp = tmp->next_brother;
+	while (NULL != tmp) {
+		printf("<%d>  %d  ",counter++, tmp->data);
 		tmp = tmp->next_brother;
-		printf("(%d)  %s  ",counter++, tmp->name);
 	}
 	printf(" \n");
 }
@@ -120,58 +93,21 @@ void display_brother(position head) {
 int count_brother(position head) {
 	position tmp = head;
 	int count = 0;
-	while (tmp->next_brother != NULL) {
-		tmp = tmp->next_brother;
+	while (NULL != tmp->next_brother) {
 		count++;
+		tmp = tmp->next_brother;
 	}
 	return count;
 }
 
-
-void chose_directory(position head) {
-	int loop = 1;
-	int selection;
-	printf("Kada birate morate unijeti broj lijevo od direktorija!! \n");
-	display_brother(head);
-	printf("Unesite pod kojim direktorijem zelite napraviti poddirektorij: \n");
-
-	scanf(" %d", &selection);
-
-	while (selection < 1 || selection > count_brother(head)) {
-		printf("Odabrali ste nevaljani direktorij, molimo vas pokusajte ponovno: ");
-		scanf(" %d", &selection);
-	}
-	while (selection > 0) {
-		head = head->next_brother;
-		selection--;
-	}
-
-	create_child(head);
-}
-
-
 void create_child(position head) {
-	position tmp = (position)malloc(sizeof(struct directory));
-	tmp->next_brother = NULL;
-	tmp->next_child = NULL;
-
-	printf("Unesite naziv za poddirektorij:  ");
-	scanf(" %[^\n]", tmp->name);
-
-	head->next_child = tmp;
-	tmp->prev_child = head;
-
-}
-
-void display_child(position head) {
-	position tmp = head;
 	int selection;
-	printf("Od kojeg direktorija zelite vidjeti poddirektorije: \n");
 	display_brother(head);
+	printf("Izaberite broj gdje zelite napraviti poddirektorij: ");
 	scanf(" %d", &selection);
 
 	while (selection < 1 || selection > count_brother(head)) {
-		printf("Odabrali ste nevaljani direktorij, molimo vas pokusajte ponovno: ");
+		printf("Nevazeci direktorij, pokusajte ponovno: ");
 		scanf(" %d", &selection);
 	}
 
@@ -179,14 +115,34 @@ void display_child(position head) {
 		head = head->next_brother;
 		selection--;
 	}
+	head->next_child = create_root(1);
+}
+ 
 
-	if (head->next_child == NULL)
-		printf("U %s direktoriju nema poddirektorija!! \n", head->name);
+void enter_child(position head) {
+	int selection;
+	display_brother(head);
+	printf("Od kojeg direktorija zelite pogleadi poddirektorije: ");
+	scanf(" %d", &selection);
+
+	while (selection < 1 || selection > count_brother(head)) {
+		printf("Nevazeci direktorij, pokusajte ponovno: ");
+		scanf(" %d", &selection);
+	}
+
+	while (selection > 0) {
+		selection--;
+		head = head->next_brother;
+	}
+	
+	head = head->next_child;
+
+	if (head == NULL) {
+		printf("Vas direktorij ne sadrzi poddirektorije!!!\n");
+	}
 	else {
-		printf("Poddirektorij %s direktorija: \n", head->name);
-		head = head->next_child;
+		printf("Poddirektoriji: ");
 		display_brother(head);
 	}
-
-
 }
+
