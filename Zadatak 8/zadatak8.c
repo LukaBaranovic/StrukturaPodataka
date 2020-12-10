@@ -6,8 +6,9 @@ Program ima funkcije:
 -ulaz u odredeni direktorij, i njegov izlaz (setanje po direktorijima)
 -prikaz direktorija (ovisi gdje se nalazimo)
 -prikaz svih direktorija i njegovih poddirektorija (ovisi gdje se nalaimo) na nacin uvljacenja poddirektorija
+-ispis svih direktorija u datoteku po default-u na kraju programa
 
-  
+
 -trenutno radim na funkcijama brisanja direktorija
 
 */
@@ -36,6 +37,8 @@ void display_directory_main(position, int);
 void rename_directory(position);
 void create_child(position);
 void enter_child(position);
+void print_in_file(position);
+void print_in_file_auxiliary(FILE*, position, int);
 
 
 
@@ -75,8 +78,7 @@ int main() {
 			break;
 		case 3:
 			enter_child(directory);
-			if (NULL != directory->next_child)
-				repeat = 1;
+			repeat = 1;
 			break;
 		case 4:
 			display_brother(directory);
@@ -95,6 +97,8 @@ int main() {
 			break;
 		}
 	}
+
+	print_in_file(directory);
 }
 
 /*
@@ -275,8 +279,7 @@ void enter_child(position head) {
 				break;
 			case 3:
 				enter_child(head);
-				if (NULL != head->next_child)
-					repeat = 1;
+				repeat = 1;
 				break;
 			case 4:
 				display_brother(head);
@@ -371,11 +374,50 @@ Biramo koji direktorij zelimo preimenovati, te provjarava ispravnost naseg unosa
 Return: /
 */
 
+void print_in_file(position head){
+	FILE* fp = fopen("direktorij.txt", "w");
+
+	if (NULL == fp)
+		printf("could not open file!\n");
+
+	fprintf(fp, "----DATOTEKA DIREKTORIJA----\n\n");
+
+	print_in_file_auxiliary(fp, head, 0);
+
+	fclose(fp);
+}
+
+/*
+Funkcija: print_in_file
+Kreira datoteku 'direktorij' i otvara ju za pisanje te se poziva pomocna funkcija 'print_in_file_auxuliary.
+Return: /
+*/
+
+void print_in_file_auxiliary(FILE* fp, position head,int offset) {
+	position tmp = head;
+	int i = 0;
+
+	while (tmp->next_brother != NULL) {
+		tmp = tmp->next_brother;
+		for (i = 0; i < offset; i++) {
+			fprintf(fp,"  ");
+		}
+		fprintf(fp,"-%d \n", tmp->data);
+
+		if (tmp->next_child != NULL)
+			print_in_file_auxiliary(fp,tmp->next_child, offset + 1);
+	}
+}
+
+/*
+Funkcija: print_in_file_auxiliary 
+Pomocna funkcija funkcije 'print_in_file' koja prima pointer na datoteku i upise sadrzaj svih direktorija na isti nacin 
+kako funkcija 'display_directory_main' vrsi ispis na konzolu. 
+Po default-u se poziva na kraju programa.
+Return: /
+*/
 
 
-
-
-/*neradi trenutno*/
 
 
 void chose_delete_brother(position head) {
