@@ -8,7 +8,6 @@ Funkcije:
 */
 
 
-
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <string.h>
@@ -28,14 +27,62 @@ void append_brother(position);
 void display_brother(position);
 int count_brother(position);
 
+void display_directory_main(position, int);
+void rename_directory(position);
+
 void create_child(position);
 void enter_child(position);
 
+
+
+void chose_delete_brother(position);
+void delete_brother(position);
+
+
+
 int main() {
 	position directory = create_root(0);
-	create_child(directory);
-	enter_child(directory);
+	int loop = 1, action;
 
+	printf("(1) Dodaj direktorij \n");
+	printf("(2) Dodaj poddirektorij \n");
+	printf("(3) Udji u odredjeni direktorij \n");
+	printf("(4) Prikazi direktorij \n");
+	printf("(5) Prikazi sve direktorije i sve njihove poddirektorije \n");
+	printf("(6) Preimenuj direktorij \n");
+	printf("(00) Izadji iz programa \n");
+
+	while (loop == 1) {
+		printf("\n Izaberi radnju: ");
+		scanf("%d", &action);
+
+		switch (action) {
+		case 1:
+			append_brother(directory);
+			break;
+		case 2:
+			create_child(directory);
+			break;
+		case 3:
+			enter_child(directory);
+			break;
+		case 4:
+			display_brother(directory);
+			break;
+		case 5:
+			display_directory_main(directory, 0);
+			break;
+		case 6:
+			rename_directory(directory);
+			break;
+		case 00:
+			loop = 0;
+			break;
+		default:
+			printf("Nepostojeca radnja!!\n");
+			break;
+		}
+	}
 }
 
 
@@ -64,7 +111,6 @@ position create_root(int x) {
 	return head;
 }
 
-
 void append_brother(position head) {
 	position tmp = (position)malloc(sizeof(struct Node));
 	tmp->next_brother = NULL;
@@ -88,7 +134,6 @@ void display_brother(position head) {
 	}
 	printf(" \n");
 }
-
 
 int count_brother(position head) {
 	position tmp = head;
@@ -115,10 +160,15 @@ void create_child(position head) {
 		head = head->next_brother;
 		selection--;
 	}
-	head->next_child = create_root(1);
+	if (head->next_child != NULL) {
+		append_brother(head->next_child);
+	}
+	else
+	{
+		head->next_child = create_root(1);
+	}
 }
  
-
 void enter_child(position head) {
 	int selection;
 	display_brother(head);
@@ -134,15 +184,101 @@ void enter_child(position head) {
 		selection--;
 		head = head->next_brother;
 	}
-	
 	head = head->next_child;
 
 	if (head == NULL) {
 		printf("Vas direktorij ne sadrzi poddirektorije!!!\n");
 	}
 	else {
-		printf("Poddirektoriji: ");
-		display_brother(head);
+
+
 	}
 }
 
+void display_directory_main(position head,int offset) {
+	position tmp = head;
+	int i;
+	
+
+	while (tmp->next_brother != NULL) {
+		tmp = tmp->next_brother;
+		for (i = 0; i < offset; i++) {
+			printf("  ");
+		}
+		printf("-%d \n", tmp->data);
+
+		if (tmp->next_child != NULL)
+			display_directory_main(tmp->next_child, offset + 1);
+
+	}
+}
+
+void rename_directory(position head) {
+	int selection;
+	int renamed;
+	display_brother(head);
+	printf("Koji direktorij zelite preimenovati: ");
+	scanf(" %d", &selection);
+
+	while (selection < 1 || selection > count_brother(head)) {
+		printf("Nevazeci direktorij, pokusajte ponovno: ");
+		scanf(" %d", &selection);
+	}
+	while (selection > 0) {
+		selection--;
+		head = head->next_brother;
+	}
+	printf("Upisite novu vrijednost: ");
+	scanf(" %d", &renamed);
+	head->data = renamed;
+}
+
+
+
+
+
+
+/*neradi trenutno*/
+
+
+void chose_delete_brother(position head) {
+	int selection;
+	display_brother(head);
+	printf("Izaberite koji direktorij zelite obrisati: ");
+	scanf(" %d", &selection);
+
+	while (selection < 1 || selection > count_brother(head)) {
+		printf("Nevazeci direktorij, pokusajte ponovno: ");
+		scanf(" %d", &selection);
+	}
+
+	while (selection > 0) {
+		selection--;
+		head = head->next_brother;
+	}
+	
+	
+	delete_brother(head); 
+	position tmp = head;
+	free(tmp);
+	head = head->next_brother;
+	
+}
+
+void delete_brother(position head) {
+	position tmp;
+
+
+	if (head->next_child != NULL) {	
+		tmp = head;
+		head = head->next_child;
+		free(tmp);
+		delete_brother(head->next_child);
+	}
+	if (head->next_brother != NULL) {
+		tmp = head;
+		head = head->next_brother;
+		free(tmp);
+		delete_brother(head->next_brother);
+	}
+}
