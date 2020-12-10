@@ -1,11 +1,17 @@
 /*
-Trentuno u radu.
-Funkcije:
--napravi direktorij
--napravi poddirektorij
--ispisi direktorije
--ispisi poddirektorije
+Program ima funkcije:
+-kreiraj direktorij
+-kreiraj poddirektorijj
+-promjeniti ime direktorija
+-ulaz u odredeni direktorij, i njegov izlaz (setanje po direktorijima)
+-prikaz direktorija (ovisi gdje se nalazimo)
+-prikaz svih direktorija i njegovih poddirektorija (ovisi gdje se nalaimo) na nacin uvljacenja poddirektorija
+
+  
+-trenutno radim na funkcijama brisanja direktorija
+
 */
+
 
 
 #define _CRT_SECURE_NO_WARNINGS
@@ -26,10 +32,8 @@ position create_root(int);
 void append_brother(position);
 void display_brother(position);
 int count_brother(position);
-
 void display_directory_main(position, int);
 void rename_directory(position);
-
 void create_child(position);
 void enter_child(position);
 
@@ -43,17 +47,23 @@ void delete_brother(position);
 int main() {
 	position directory = create_root(0);
 	int loop = 1, action;
+	int repeat = 1;
 
-	printf("(1) Dodaj direktorij \n");
-	printf("(2) Dodaj poddirektorij \n");
-	printf("(3) Udji u odredjeni direktorij \n");
-	printf("(4) Prikazi direktorij \n");
-	printf("(5) Prikazi sve direktorije i sve njihove poddirektorije \n");
-	printf("(6) Preimenuj direktorij \n");
-	printf("(00) Izadji iz programa \n");
 
 	while (loop == 1) {
-		printf("\n Izaberi radnju: ");
+		if (repeat == 1) {
+			printf("(1) Dodaj direktorij \n");
+			printf("(2) Dodaj poddirektorij \n");
+			printf("(3) Udji u odredjeni direktorij \n");
+			printf("(4) Prikazi direktorij \n");
+			printf("(5) Prikazi sve direktorije i sve njihove poddirektorije \n");
+			printf("(6) Preimenuj direktorij \n");
+			printf("(00) Izadji iz programa \n\n");
+			repeat = 0;
+		}
+
+
+		printf("Izaberi radnju: ");
 		scanf("%d", &action);
 
 		switch (action) {
@@ -65,6 +75,8 @@ int main() {
 			break;
 		case 3:
 			enter_child(directory);
+			if (NULL != directory->next_child)
+				repeat = 1;
 			break;
 		case 4:
 			display_brother(directory);
@@ -85,8 +97,12 @@ int main() {
 	}
 }
 
-
-
+/*
+Funkcija: main
+Na pocetku programa se po defalt-u pita za unos prvog 'glavnog' direktorija.
+Nakon toga ulazimo while petlju gdje imamo razne funkcjie koje mozemo birati za izvrsavanje programa.
+Izlaz iz programa se vrsi upisom '00' s kojim izlazimo iz while petlje (while loop == 1).
+*/
 
 
 
@@ -111,6 +127,13 @@ position create_root(int x) {
 	return head;
 }
 
+/*
+Funkcija: create_root
+Kreira 'korijen stabla' za upis naseg prvog elementa u direktorij, te za kreiranje poddirektorija.
+Vrsi se alociranje memorije te nan vraca listu 'head' u kojem u prvi element 'dummy' element za svaki novi poddirektorij.
+Return: position
+*/
+
 void append_brother(position head) {
 	position tmp = (position)malloc(sizeof(struct Node));
 	tmp->next_brother = NULL;
@@ -122,6 +145,12 @@ void append_brother(position head) {
 	tmp->next_brother = head->next_brother;
 	head->next_brother = tmp;
 }
+
+/*
+Funkcija: append_brother
+Dodaje direktorij, odnosno 'brata', do onog direktorija ovisno gdje se nalazimo u direktoriju.
+Return: /
+*/
 
 void display_brother(position head) {
 	position tmp = head;
@@ -135,6 +164,12 @@ void display_brother(position head) {
 	printf(" \n");
 }
 
+/*
+Funkcija display_brother
+Vrsi ispis svih direktorija, svih 'braca' direktorija, ovisno gdje se nalazimo u direktoriju.
+Return: /
+*/
+
 int count_brother(position head) {
 	position tmp = head;
 	int count = 0;
@@ -144,6 +179,13 @@ int count_brother(position head) {
 	}
 	return count;
 }
+
+/*
+Funkcija: count_brother
+Broji direktorije, svih 'braca', koja nam sluzi u funkcijama kada biramo odredenu randnju za direktorij da 
+ne bi upisali direktorij koji ne postoji. (npr. funkcija enter_child,create_child o kojoj ce biti objasnjeno o tome).
+Return: int 
+*/
 
 void create_child(position head) {
 	int selection;
@@ -168,9 +210,23 @@ void create_child(position head) {
 		head->next_child = create_root(1);
 	}
 }
+
+/*
+Funkcija: create_child
+Ispisuje nam sve direktorije ovisno o tome gdje se nalazimo, te nam daje na odabir kojem od direktorija zelimo napraviti poddirektorij. 
+Program vrsi provjeru je li taj direktorij postoji (mora biti broj izmedju 1 i count_brother(direktorij), a ako nije pita nas da 
+pokusamo ponovno).
+Ako smo ispravno unijeli direktorij program uz pomoc funkcije 'create_root' kreira poddirektorij direktorija.
+NAPOMENA: funkcija je pametna jer ako uoci da u tom direktoriju vec postoje poddirektoriji ona koristi funkciju 'append_brother' da
+bi mu dodala brata, odnosno novi direktorij tom poddirektoriju.
+Return: /
+*/
  
 void enter_child(position head) {
 	int selection;
+	int loop = 1, action;
+	int repeat = 1;
+
 	display_brother(head);
 	printf("Od kojeg direktorija zelite pogleadi poddirektorije: ");
 	scanf(" %d", &selection);
@@ -190,10 +246,69 @@ void enter_child(position head) {
 		printf("Vas direktorij ne sadrzi poddirektorije!!!\n");
 	}
 	else {
+		printf("Sadrzaj poddirektorija:  ");
+		display_brother(head);
+		printf("\n");
 
+
+		while (loop == 1) {
+
+			if (repeat == 1) {
+				printf("(1) Dodaj direktorij \n");
+				printf("(2) Dodaj poddirektorij \n");
+				printf("(3) Udji u odredjeni direktorij \n");
+				printf("(4) Prikazi direktorij \n");
+				printf("(5) Prikazi sve direktorije i sve njihove poddirektorije \n");
+				printf("(6) Preimenuj direktorij \n");
+				printf("(00) Povratak na prosli direktorij \n");
+				repeat = 0;
+			}
+			printf("Izaberi radnju: ");
+			scanf("%d", &action);
+
+			switch (action) {
+			case 1:
+				append_brother(head);
+				break;
+			case 2:
+				create_child(head);
+				break;
+			case 3:
+				enter_child(head);
+				if (NULL != head->next_child)
+					repeat = 1;
+				break;
+			case 4:
+				display_brother(head);
+				break;
+			case 5:
+				display_directory_main(head, 0);
+				break;
+			case 6:
+				rename_directory(head);
+				break;
+			case 00:
+				loop = 0;
+				break;
+			default:
+				printf("Nepostojeca radnja!!\n");
+				break;
+			}
+		}
 
 	}
 }
+
+/*
+Funkcija enter_child
+Jedna od bitnijih funkcija programa koja nam omogucava 'setanje' po direktorijima i poddirektorijima.
+Program nas pita u koji direktorij zelimo uc, te nam stavlja taj direktorij kao 'glavni' dok ne napravimo povrat na prethodne 
+direktorije upisom '00'.
+Vrsi provjeru je li postoji direktorij u koji zelimo uc (mora biti broj izmedju 1 i count_brother()).
+Sadrzi while petlju kao i u funkciji 'main' jer ostajemo na trenutnom direktoriju kako bi mogli raditi odredene 
+radnje tu gdje se nalazimo (dodati jos direktorija, poddirektorija, preimonovanja i brisanja)
+Return: /
+*/
 
 void display_directory_main(position head,int offset) {
 	position tmp = head;
@@ -212,6 +327,23 @@ void display_directory_main(position head,int offset) {
 
 	}
 }
+
+/*
+Funkcija display_directory_main
+Vrsi ispis svih direktorija i svih njegovij poddirektorija i poddirektorija poddirektorija...
+Kada ispis direktorij, za ispis poddirektorija se tekst uvlaci na nacin:
+ DIREKTORIJ 1
+ DIREKTORIJ 2
+	-DIREKTORIJ 2.1
+		-DIREKTORIJ 2.1.1
+			-DIREKTORIJ 2.1.1.1
+		-DIREKTORIJ 2.1.2
+	-DIREKTORIJ 2.2
+		-DIREKTORIJ 2.2.1
+	DIREKTORIJ 2.3
+ DIREKTORIJ 3
+Return: /
+*/
 
 void rename_directory(position head) {
 	int selection;
@@ -233,6 +365,11 @@ void rename_directory(position head) {
 	head->data = renamed;
 }
 
+/*
+Funkcija: rename_directory
+Biramo koji direktorij zelimo preimenovati, te provjarava ispravnost naseg unosa( je li taj direktorij uopce postoji).
+Return: /
+*/
 
 
 
