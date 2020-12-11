@@ -24,7 +24,7 @@ Program ima funkcije:
 typedef struct Node* position;
 
 struct Node {
-	int data;
+	char data[BUFFER];
 	position next_brother;
 	position next_child;
 };
@@ -51,11 +51,14 @@ int main() {
 	position directory = create_root(0);
 	int loop = 1, action;
 	int repeat = 1;
+	int location = 0;
+
+
 
 
 	while (loop == 1) {
 		if (repeat == 1) {
-			printf("(1) Dodaj direktorij \n");
+			printf("\n(1) Dodaj direktorij \n");
 			printf("(2) Dodaj poddirektorij \n");
 			printf("(3) Udji u odredjeni direktorij \n");
 			printf("(4) Prikazi direktorij \n");
@@ -63,6 +66,12 @@ int main() {
 			printf("(6) Preimenuj direktorij \n");
 			printf("(00) Izadji iz programa \n\n");
 			repeat = 0;
+		}
+
+		if (location == 1) {
+			printf("Vratili ste se na glavni direktorij: ");
+			display_brother(directory);
+			location = 0;
 		}
 
 
@@ -79,6 +88,7 @@ int main() {
 		case 3:
 			enter_child(directory);
 			repeat = 1;
+			location = 1;
 			break;
 		case 4:
 			display_brother(directory);
@@ -126,7 +136,7 @@ position create_root(int x) {
 		printf("Unesite poddirektorij: ");
 	}
 
-	scanf(" %d", &tmp->data);
+	scanf(" %[^\n]", tmp->data);
 	head->next_brother = tmp;
 	return head;
 }
@@ -139,12 +149,22 @@ Return: position
 */
 
 void append_brother(position head) {
+	int loop = 1;
 	position tmp = (position)malloc(sizeof(struct Node));
 	tmp->next_brother = NULL;
 	tmp->next_child = NULL;
 
 	printf("Unesite direktorij: ");
-	scanf(" %d", &tmp->data);
+	scanf(" %[^\n]", tmp->data);
+
+	while (head->next_brother != NULL && loop == 1) {
+		if (strcmp(tmp->data, head->next_brother->data) > 0) {
+			head = head->next_brother;
+		}
+		else {
+			loop = 0;
+		}
+	}
 
 	tmp->next_brother = head->next_brother;
 	head->next_brother = tmp;
@@ -162,7 +182,7 @@ void display_brother(position head) {
 
 	tmp = tmp->next_brother;
 	while (NULL != tmp) {
-		printf("<%d>  %d  ",counter++, tmp->data);
+		printf("<%d>  %s  ",counter++, tmp->data);
 		tmp = tmp->next_brother;
 	}
 	printf(" \n");
@@ -230,6 +250,7 @@ void enter_child(position head) {
 	int selection;
 	int loop = 1, action;
 	int repeat = 1;
+	int location = 0;
 
 	display_brother(head);
 	printf("Od kojeg direktorija zelite pogleadi poddirektorije: ");
@@ -244,13 +265,14 @@ void enter_child(position head) {
 		selection--;
 		head = head->next_brother;
 	}
-	head = head->next_child;
 
-	if (head == NULL) {
+	if (head->next_child == NULL) {
 		printf("Vas direktorij ne sadrzi poddirektorije!!!\n");
 	}
 	else {
-		printf("Sadrzaj poddirektorija:  ");
+		printf("Sadrzaj direktorija ( %s ): ",head->data);
+		head = head->next_child;
+
 		display_brother(head);
 		printf("\n");
 
@@ -264,10 +286,18 @@ void enter_child(position head) {
 				printf("(4) Prikazi direktorij \n");
 				printf("(5) Prikazi sve direktorije i sve njihove poddirektorije \n");
 				printf("(6) Preimenuj direktorij \n");
-				printf("(00) Povratak na prosli direktorij \n");
+				printf("(00) Povratak na prosli direktorij \n\n");
 				repeat = 0;
 			}
-			printf("Izaberi radnju: ");
+
+			if (location == 1) {
+				printf("\nVratili ste se na direktorije: ");
+				display_brother(head);
+				printf("\n");
+				location = 0;
+			}
+
+			printf("Izaberi radnju:  ");
 			scanf("%d", &action);
 
 			switch (action) {
@@ -280,6 +310,7 @@ void enter_child(position head) {
 			case 3:
 				enter_child(head);
 				repeat = 1;
+				location = 1;
 				break;
 			case 4:
 				display_brother(head);
@@ -323,7 +354,7 @@ void display_directory_main(position head,int offset) {
 		for (i = 0; i < offset; i++) {
 			printf("  ");
 		}
-		printf("-%d \n", tmp->data);
+		printf("-%s \n", tmp->data);
 
 		if (tmp->next_child != NULL)
 			display_directory_main(tmp->next_child, offset + 1);
@@ -351,6 +382,7 @@ Return: /
 void rename_directory(position head) {
 	int selection;
 	int renamed;
+
 	display_brother(head);
 	printf("Koji direktorij zelite preimenovati: ");
 	scanf(" %d", &selection);
@@ -364,8 +396,7 @@ void rename_directory(position head) {
 		head = head->next_brother;
 	}
 	printf("Upisite novu vrijednost: ");
-	scanf(" %d", &renamed);
-	head->data = renamed;
+	scanf(" %[^\n]", head->data);
 }
 
 /*
@@ -402,7 +433,7 @@ void print_in_file_auxiliary(FILE* fp, position head,int offset) {
 		for (i = 0; i < offset; i++) {
 			fprintf(fp,"  ");
 		}
-		fprintf(fp,"-%d \n", tmp->data);
+		fprintf(fp,"-%s \n", tmp->data);
 
 		if (tmp->next_child != NULL)
 			print_in_file_auxiliary(fp,tmp->next_child, offset + 1);
@@ -416,7 +447,6 @@ kako funkcija 'display_directory_main' vrsi ispis na konzolu.
 Po default-u se poziva na kraju programa.
 Return: /
 */
-
 
 
 
@@ -446,7 +476,6 @@ void chose_delete_brother(position head) {
 
 void delete_brother(position head) {
 	position tmp;
-
 
 	if (head->next_child != NULL) {	
 		tmp = head;
