@@ -1,0 +1,106 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <string.h>
+#define BUFFER 256
+
+
+typedef struct Node* position;
+struct Node {
+	char caracter;
+	int sentiment;
+	int type;
+	position next_brother;
+	position next_child;
+};
+
+
+void read_from_file(position);
+void append_word(position, char*, int);
+position append_caracter(position, char);
+
+
+int main() {
+	position trie = (position)malloc(sizeof(struct Node));
+	trie->next_brother = NULL;
+	trie->next_child = NULL;
+
+	read_from_file(trie);
+
+
+}
+
+
+void read_from_file(position head) {
+	FILE* fp = fopen("rijeci.txt", "r");
+	char* source = NULL;
+	source = (char*)malloc(BUFFER * sizeof(char));
+	char *word = NULL;
+	word = (char*)malloc(BUFFER * sizeof(char));
+
+	if (fp == NULL)
+		printf("Eror reading file");
+	
+
+	int offset = 0;
+	int  sentiment = 0;
+	 
+	
+	while (!feof(fp)) {
+		fgets(source, BUFFER, fp);
+		
+
+		sscanf(source, " %s %d %n", word, &sentiment, &offset);
+		while (offset != 0) {
+
+			append_word(head, word, sentiment);
+
+			//  printf(" %s - %d \n", word, sentiment);
+			source += offset;
+			offset = 0;
+			sscanf(source, " %s %d %n", word, &sentiment, &offset);
+		}
+		
+	}
+	
+}
+
+
+void append_word(position head, char* word, int sentiment) {
+	char caracter;
+	int offset = 0;
+	int type = 0;
+
+
+	sscanf(word, " %c%n", &caracter, &offset);
+	while (offset != 0) {
+		
+		
+
+		head = append_caracter(head, caracter);
+		word += offset;
+		offset = 0;
+		sscanf(word, " %c%n", &caracter, &offset);
+
+	}
+	sscanf(word, " %d%n", &type, &offset);
+	
+
+}
+
+position append_caracter(position head, char caracter) {
+	int loop = 1;
+
+	position tmp = (position)malloc(sizeof(struct Node));
+	tmp->next_brother = NULL;
+	tmp->next_child = NULL;
+	tmp->caracter = caracter;
+
+	
+	printf(" %c", caracter);
+
+	
+
+
+	
+	return head;
+}
