@@ -16,8 +16,8 @@ struct Node {
 
 void read_from_file(position);
 void append_word(position, char*, int);
-position append_caracter(position, char);
-
+void append_caracter(position, char);
+position create_root(char);
 
 int main() {
 	position trie = (position)malloc(sizeof(struct Node));
@@ -26,7 +26,11 @@ int main() {
 
 	read_from_file(trie);
 
-
+	
+	 printf(" %c ", trie->next_child->next_brother->caracter);
+	 printf(" %c ", trie->next_child->next_brother->next_child->next_brother->caracter);
+	
+	
 }
 
 
@@ -69,14 +73,21 @@ void append_word(position head, char* word, int sentiment) {
 	char caracter;
 	int offset = 0;
 	int type = 0;
+	int loop = 1;
 
 
 	sscanf(word, " %c%n", &caracter, &offset);
-	while (offset != 0) {
-		
-		
 
-		head = append_caracter(head, caracter);
+	while (offset != 0) {
+		append_caracter(head, caracter);
+		head = head->next_child;
+		head = head->next_brother;
+		while (caracter != head->caracter) {
+			printf("moli za 1");
+			head = head->next_brother;
+		}
+	
+
 		word += offset;
 		offset = 0;
 		sscanf(word, " %c%n", &caracter, &offset);
@@ -87,20 +98,30 @@ void append_word(position head, char* word, int sentiment) {
 
 }
 
-position append_caracter(position head, char caracter) {
-	int loop = 1;
+void append_caracter(position head, char caracter) {
+	
+	if (head->next_child == NULL) {
+		head->next_child = create_root(caracter);
+	}
 
+
+	printf("1");
+	
+}
+
+
+position create_root(char caracter) {
+	position head = (position)malloc(sizeof(struct Node));
+	head->next_brother = NULL;
+	head->next_child = NULL;
 	position tmp = (position)malloc(sizeof(struct Node));
 	tmp->next_brother = NULL;
 	tmp->next_child = NULL;
-	tmp->caracter = caracter;
 
-	
+	tmp->caracter = caracter;
+	head->next_brother = tmp;
+
 	printf(" %c", caracter);
 
-	
-
-
-	
 	return head;
 }
