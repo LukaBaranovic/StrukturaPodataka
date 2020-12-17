@@ -18,6 +18,9 @@ void read_from_file(position);
 void append_word(position, char*, int);
 void append_caracter(position, char);
 position create_root(char);
+void append_brother(position, char);
+void display_directory_main(position, int);
+
 
 int main() {
 	position trie = (position)malloc(sizeof(struct Node));
@@ -26,10 +29,8 @@ int main() {
 
 	read_from_file(trie);
 
-	
-	 printf(" %c ", trie->next_child->next_brother->caracter);
-	 printf(" %c ", trie->next_child->next_brother->next_child->next_brother->caracter);
-	
+	display_directory_main(trie, 0);
+
 	
 }
 
@@ -58,7 +59,7 @@ void read_from_file(position head) {
 
 			append_word(head, word, sentiment);
 
-			//  printf(" %s - %d \n", word, sentiment);
+			 printf(" %s - %d \n", word, sentiment);
 			source += offset;
 			offset = 0;
 			sscanf(source, " %s %d %n", word, &sentiment, &offset);
@@ -82,10 +83,7 @@ void append_word(position head, char* word, int sentiment) {
 		append_caracter(head, caracter);
 		head = head->next_child;
 		head = head->next_brother;
-		while (caracter != head->caracter) {
-			printf("moli za 1");
-			head = head->next_brother;
-		}
+	
 	
 
 		word += offset;
@@ -94,6 +92,10 @@ void append_word(position head, char* word, int sentiment) {
 
 	}
 	sscanf(word, " %d%n", &type, &offset);
+
+	head->sentiment = sentiment;
+	head->type = 1;
+
 	
 
 }
@@ -103,10 +105,39 @@ void append_caracter(position head, char caracter) {
 	if (head->next_child == NULL) {
 		head->next_child = create_root(caracter);
 	}
+	else if (head->next_child != NULL) {
+		append_brother(head->next_child, caracter);
+	}
 
 
-	printf("1");
 	
+}
+
+void append_brother(position head, char caracter) {
+	int loop = 1;
+	position tmp = (position)malloc(sizeof(struct Node));
+	tmp->next_brother = NULL;
+	tmp->next_child = NULL;
+	tmp->caracter = caracter;
+
+	while(head->next_brother != NULL && loop == 1){
+		if (head->next_brother->caracter == caracter) {
+			loop = 0;
+	}
+		else if (head->next_brother->caracter > caracter) {
+			head = head->next_brother;
+		}
+		else if (head->next_brother->caracter < caracter) {
+			loop = 0;
+			if (head->next_brother == NULL) {
+				head->next_brother = tmp;
+			}
+			else if (head->next_brother != NULL) {
+				tmp->next_brother = head->next_brother;
+				head->next_brother = tmp;
+			}
+		}
+	}
 }
 
 
@@ -125,3 +156,34 @@ position create_root(char caracter) {
 
 	return head;
 }
+
+
+void display_directory_main(position head, int offset) {
+	position tmp = head;
+	int i;
+	printf(" jedan ");
+
+	while (tmp->next_brother != NULL) {
+		tmp = tmp->next_brother;
+		for (i = 0; i < offset; i++) {
+			printf("  ");
+		}
+		printf("-%c \n", tmp->caracter);
+
+		if (tmp->next_child != NULL)
+			display_directory_main(tmp->next_child, offset + 1);
+
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
