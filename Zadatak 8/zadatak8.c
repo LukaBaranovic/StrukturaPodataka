@@ -25,7 +25,7 @@ struct Node {
 	position next_brother;
 	position next_child;
 };
-
+ 
 position create_root(int);
 void append_brother(position);
 void display_brother(position);
