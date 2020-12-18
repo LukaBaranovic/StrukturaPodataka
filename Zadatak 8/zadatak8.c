@@ -7,10 +7,7 @@ Program ima funkcije:
 -prikaz direktorija (ovisi gdje se nalazimo)
 -prikaz svih direktorija i njegovih poddirektorija (ovisi gdje se nalaimo) na nacin uvljacenja poddirektorija
 -ispis svih direktorija u datoteku po default-u na kraju programa
-
-
 -trenutno radim na funkcijama brisanja direktorija
-
 */
 
 
@@ -42,8 +39,7 @@ void print_in_file_auxiliary(FILE*, position, int);
 
 
 
-void chose_delete_brother(position);
-void delete_brother(position);
+void delete_all(position);
 
 
 
@@ -109,6 +105,7 @@ int main() {
 	}
 
 	print_in_file(directory);
+	delete_all(directory);
 }
 
 /*
@@ -179,10 +176,11 @@ Return: /
 void display_brother(position head) {
 	position tmp = head;
 	int counter = 1;
+	printf("\n");
 
 	tmp = tmp->next_brother;
 	while (NULL != tmp) {
-		printf("<%d>  %s  ",counter++, tmp->data);
+		printf("<%d>  %s  \n", counter++, tmp->data);
 		tmp = tmp->next_brother;
 	}
 	printf(" \n");
@@ -206,9 +204,9 @@ int count_brother(position head) {
 
 /*
 Funkcija: count_brother
-Broji direktorije, svih 'braca', koja nam sluzi u funkcijama kada biramo odredenu randnju za direktorij da 
+Broji direktorije, svih 'braca', koja nam sluzi u funkcijama kada biramo odredenu randnju za direktorij da
 ne bi upisali direktorij koji ne postoji. (npr. funkcija enter_child,create_child o kojoj ce biti objasnjeno o tome).
-Return: int 
+Return: int
 */
 
 void create_child(position head) {
@@ -237,15 +235,15 @@ void create_child(position head) {
 
 /*
 Funkcija: create_child
-Ispisuje nam sve direktorije ovisno o tome gdje se nalazimo, te nam daje na odabir kojem od direktorija zelimo napraviti poddirektorij. 
-Program vrsi provjeru je li taj direktorij postoji (mora biti broj izmedju 1 i count_brother(direktorij), a ako nije pita nas da 
+Ispisuje nam sve direktorije ovisno o tome gdje se nalazimo, te nam daje na odabir kojem od direktorija zelimo napraviti poddirektorij.
+Program vrsi provjeru je li taj direktorij postoji (mora biti broj izmedju 1 i count_brother(direktorij), a ako nije pita nas da
 pokusamo ponovno).
 Ako smo ispravno unijeli direktorij program uz pomoc funkcije 'create_root' kreira poddirektorij direktorija.
 NAPOMENA: funkcija je pametna jer ako uoci da u tom direktoriju vec postoje poddirektoriji ona koristi funkciju 'append_brother' da
 bi mu dodala brata, odnosno novi direktorij tom poddirektoriju.
 Return: /
 */
- 
+
 void enter_child(position head) {
 	int selection;
 	int loop = 1, action;
@@ -270,7 +268,7 @@ void enter_child(position head) {
 		printf("Vas direktorij ne sadrzi poddirektorije!!!\n");
 	}
 	else {
-		printf("Sadrzaj direktorija ( %s ): ",head->data);
+		printf("Sadrzaj direktorija ( %s ): ", head->data);
 		head = head->next_child;
 
 		display_brother(head);
@@ -336,18 +334,18 @@ void enter_child(position head) {
 /*
 Funkcija enter_child
 Jedna od bitnijih funkcija programa koja nam omogucava 'setanje' po direktorijima i poddirektorijima.
-Program nas pita u koji direktorij zelimo uc, te nam stavlja taj direktorij kao 'glavni' dok ne napravimo povrat na prethodne 
+Program nas pita u koji direktorij zelimo uc, te nam stavlja taj direktorij kao 'glavni' dok ne napravimo povrat na prethodne
 direktorije upisom '00'.
 Vrsi provjeru je li postoji direktorij u koji zelimo uc (mora biti broj izmedju 1 i count_brother()).
-Sadrzi while petlju kao i u funkciji 'main' jer ostajemo na trenutnom direktoriju kako bi mogli raditi odredene 
+Sadrzi while petlju kao i u funkciji 'main' jer ostajemo na trenutnom direktoriju kako bi mogli raditi odredene
 radnje tu gdje se nalazimo (dodati jos direktorija, poddirektorija, preimonovanja i brisanja)
 Return: /
 */
 
-void display_directory_main(position head,int offset) {
+void display_directory_main(position head, int offset) {
 	position tmp = head;
 	int i;
-	
+
 
 	while (tmp->next_brother != NULL) {
 		tmp = tmp->next_brother;
@@ -405,7 +403,7 @@ Biramo koji direktorij zelimo preimenovati, te provjarava ispravnost naseg unosa
 Return: /
 */
 
-void print_in_file(position head){
+void print_in_file(position head) {
 	FILE* fp = fopen("direktorij.txt", "w");
 
 	if (NULL == fp)
@@ -424,69 +422,41 @@ Kreira datoteku 'direktorij' i otvara ju za pisanje te se poziva pomocna funkcij
 Return: /
 */
 
-void print_in_file_auxiliary(FILE* fp, position head,int offset) {
+void print_in_file_auxiliary(FILE* fp, position head, int offset) {
 	position tmp = head;
 	int i = 0;
 
 	while (tmp->next_brother != NULL) {
 		tmp = tmp->next_brother;
 		for (i = 0; i < offset; i++) {
-			fprintf(fp,"  ");
+			fprintf(fp, "  ");
 		}
-		fprintf(fp,"-%s \n", tmp->data);
+		fprintf(fp, "-%s \n", tmp->data);
 
 		if (tmp->next_child != NULL)
-			print_in_file_auxiliary(fp,tmp->next_child, offset + 1);
+			print_in_file_auxiliary(fp, tmp->next_child, offset + 1);
 	}
 }
 
 /*
-Funkcija: print_in_file_auxiliary 
-Pomocna funkcija funkcije 'print_in_file' koja prima pointer na datoteku i upise sadrzaj svih direktorija na isti nacin 
-kako funkcija 'display_directory_main' vrsi ispis na konzolu. 
+Funkcija: print_in_file_auxiliary
+Pomocna funkcija funkcije 'print_in_file' koja prima pointer na datoteku i upise sadrzaj svih direktorija na isti nacin
+kako funkcija 'display_directory_main' vrsi ispis na konzolu.
 Po default-u se poziva na kraju programa.
 Return: /
 */
 
 
-
-void chose_delete_brother(position head) {
-	int selection;
-	display_brother(head);
-	printf("Izaberite koji direktorij zelite obrisati: ");
-	scanf(" %d", &selection);
-
-	while (selection < 1 || selection > count_brother(head)) {
-		printf("Nevazeci direktorij, pokusajte ponovno: ");
-		scanf(" %d", &selection);
-	}
-
-	while (selection > 0) {
-		selection--;
-		head = head->next_brother;
-	}
-	
-	
-	delete_brother(head); 
-	position tmp = head;
-	free(tmp);
-	head = head->next_brother;
-	
+void delete_all(position head) {
+	if (head == NULL)
+		return;
+	delete_all(head->next_brother);
+	delete_all(head->next_child);
+	free(head);
 }
 
-void delete_brother(position head) {
-	position tmp;
-
-	if (head->next_child != NULL) {	
-		tmp = head;
-		head = head->next_child;
-		free(tmp);
-		delete_brother(head->next_child);
-	}
-	if (head->next_brother != NULL) {
-		tmp = head;
-		head = head->next_brother;
-		free(tmp);
-		delete_brother(head->next_brother);
-	}
-}
+/*
+Funkcija: delete_all
+Funkcija rekurzivno brise cijeli direktorij.
+Return: /
+*/
