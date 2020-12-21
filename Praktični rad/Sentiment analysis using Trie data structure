@@ -14,12 +14,13 @@ struct Node {
 };
 
 
+
 void read_from_file(position);
 void append_word(position, char*, int);
-void append_caracter(position, char);
-position create_root(char);
-void append_brother(position, char);
 void display_directory_main(position, int);
+position append_caracter(position, char);
+position create_child(position, char);
+position append_brother(position, char);
 
 
 int main() {
@@ -28,10 +29,8 @@ int main() {
 	trie->next_child = NULL;
 
 	read_from_file(trie);
+	display_directory_main(trie->next_child, 0);
 
-	display_directory_main(trie, 0);
-
-	
 }
 
 
@@ -39,151 +38,128 @@ void read_from_file(position head) {
 	FILE* fp = fopen("rijeci.txt", "r");
 	char* source = NULL;
 	source = (char*)malloc(BUFFER * sizeof(char));
-	char *word = NULL;
+	char* word = NULL;
 	word = (char*)malloc(BUFFER * sizeof(char));
 
 	if (fp == NULL)
 		printf("Eror reading file");
-	
+
 
 	int offset = 0;
 	int  sentiment = 0;
-	 
-	
+
+
 	while (!feof(fp)) {
 		fgets(source, BUFFER, fp);
-		
+
 
 		sscanf(source, " %s %d %n", word, &sentiment, &offset);
 		while (offset != 0) {
 
 			append_word(head, word, sentiment);
 
-			 printf(" %s - %d \n", word, sentiment);
+			printf(" %s - %d \n", word, sentiment);
 			source += offset;
 			offset = 0;
 			sscanf(source, " %s %d %n", word, &sentiment, &offset);
 		}
-		
-	}
-	
-}
 
+	}
+	printf("\n");
+}
 
 void append_word(position head, char* word, int sentiment) {
 	char caracter;
-	int offset = 0;
 	int type = 0;
-	int loop = 1;
-
+	int offset = 0;
 
 	sscanf(word, " %c%n", &caracter, &offset);
-
+	
 	while (offset != 0) {
-		append_caracter(head, caracter);
-		head = head->next_child;
-		head = head->next_brother;
-	
-	
-
+		head = append_caracter(head, caracter);
 		word += offset;
 		offset = 0;
 		sscanf(word, " %c%n", &caracter, &offset);
 
 	}
 	sscanf(word, " %d%n", &type, &offset);
+	word += offset;
 
 	head->sentiment = sentiment;
 	head->type = 1;
-
-	
-
-}
-
-void append_caracter(position head, char caracter) {
-	
-	if (head->next_child == NULL) {
-		head->next_child = create_root(caracter);
-	}
-	else if (head->next_child != NULL) {
-		append_brother(head->next_child, caracter);
-	}
-
-
-	
-}
-
-void append_brother(position head, char caracter) {
-	int loop = 1;
-	position tmp = (position)malloc(sizeof(struct Node));
-	tmp->next_brother = NULL;
-	tmp->next_child = NULL;
-	tmp->caracter = caracter;
-
-	while(head->next_brother != NULL && loop == 1){
-		if (head->next_brother->caracter == caracter) {
-			loop = 0;
-	}
-		else if (head->next_brother->caracter > caracter) {
-			head = head->next_brother;
-		}
-		else if (head->next_brother->caracter < caracter) {
-			loop = 0;
-			if (head->next_brother == NULL) {
-				head->next_brother = tmp;
-			}
-			else if (head->next_brother != NULL) {
-				tmp->next_brother = head->next_brother;
-				head->next_brother = tmp;
-			}
-		}
-	}
 }
 
 
-position create_root(char caracter) {
-	position head = (position)malloc(sizeof(struct Node));
-	head->next_brother = NULL;
-	head->next_child = NULL;
-	position tmp = (position)malloc(sizeof(struct Node));
-	tmp->next_brother = NULL;
-	tmp->next_child = NULL;
-
-	tmp->caracter = caracter;
-	head->next_brother = tmp;
-
-	printf(" %c", caracter);
+position append_caracter(position head, char caracter) {
+	if (head->next_child == NULL)
+		head = create_child(head, caracter);
+	else if (head->next_child != NULL)
+		head = append_brother(head, caracter);
 
 	return head;
+}
+
+position append_brother(position head, char caracter) {
+	position tmp = (position)malloc(sizeof(struct Node));
+	tmp->next_brother = NULL;
+	tmp->next_child = NULL;
+	tmp->caracter = caracter;
+	
+	if (head->next_child->caracter > caracter) {
+		tmp->next_brother = head->next_child;
+		head->next_child = tmp;
+		head = head->next_child;
+		return head;
+	}
+	else {
+		head = head->next_child;
+		while (head->next_brother != NULL && (head->next_brother->caracter < caracter)) {
+			head = head->next_brother;
+		}
+		if (head->caracter == caracter)
+			return head;
+		else {
+			tmp->next_brother = head->next_brother;
+			head->next_brother = tmp;
+			head = head->next_brother;
+			return head;
+		}
+	}
+	
+}
+
+
+position create_child(position head, char caracter) {
+	position tmp = (position)malloc(sizeof(struct Node));
+	tmp->next_brother = NULL;
+	tmp->next_child = NULL;
+
+	tmp->caracter = caracter;
+	head->next_child = tmp;
+	
+	return head->next_child;
 }
 
 
 void display_directory_main(position head, int offset) {
 	position tmp = head;
 	int i;
-	printf(" jedan ");
 
-	while (tmp->next_brother != NULL) {
-		tmp = tmp->next_brother;
+	while (tmp != NULL) {
 		for (i = 0; i < offset; i++) {
 			printf("  ");
 		}
+		
 		printf("-%c \n", tmp->caracter);
 
 		if (tmp->next_child != NULL)
 			display_directory_main(tmp->next_child, offset + 1);
 
+		if (tmp->type == 1) {
+			printf("Kraj rijeci!, sentiment: %d \n", tmp->sentiment);
+		}
+
+		tmp = tmp->next_brother;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
 
