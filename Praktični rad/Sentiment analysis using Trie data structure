@@ -21,7 +21,7 @@ void display_directory_main(position, int);
 position append_caracter(position, char);
 position create_child(position, char);
 position append_brother(position, char);
-
+int compare(position);
 
 int main() {
 	position trie = (position)malloc(sizeof(struct Node));
@@ -29,7 +29,8 @@ int main() {
 	trie->next_child = NULL;
 
 	read_from_file(trie);
-	display_directory_main(trie->next_child, 0);
+	compare(trie);
+	// display_directory_main(trie->next_child, 0);
 
 }
 
@@ -89,7 +90,6 @@ void append_word(position head, char* word, int sentiment) {
 	head->type = 1;
 }
 
-
 position append_caracter(position head, char caracter) {
 	if (head->next_child == NULL)
 		head = create_child(head, caracter);
@@ -140,7 +140,6 @@ position create_child(position head, char caracter) {
 	return head->next_child;
 }
 
-
 void display_directory_main(position head, int offset) {
 	position tmp = head;
 	int i;
@@ -163,3 +162,30 @@ void display_directory_main(position head, int offset) {
 	}
 }
 
+int compare(position head) {
+	position tmp = head;
+	char* source = NULL;
+	source = (char*)malloc(BUFFER * sizeof(char));
+	char caracter = NULL;
+	int offset = 0;
+	int action = 1;
+
+	printf("Unesite rijec za usporedbu: ");
+	scanf(" %s", source);
+
+
+	sscanf(source, " %c%n", &caracter, &offset);
+
+	while (offset != 0) {
+		source += offset;
+		
+
+
+
+
+
+
+
+		sscanf(source, " %c%n", &caracter, &offset);
+	}
+}
