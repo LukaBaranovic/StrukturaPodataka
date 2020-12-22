@@ -29,8 +29,9 @@ int main() {
 	trie->next_child = NULL;
 
 	read_from_file(trie);
-	compare(trie);
-	// display_directory_main(trie->next_child, 0);
+	printf(" Sentiment je: %d \n", compare(trie->next_child));
+	printf(" Sentiment je: %d \n", compare(trie->next_child));
+	printf(" Sentiment je: %d \n", compare(trie->next_child));
 
 }
 
@@ -75,7 +76,7 @@ void append_word(position head, char* word, int sentiment) {
 	int offset = 0;
 
 	sscanf(word, " %c%n", &caracter, &offset);
-	
+
 	while (offset != 0) {
 		head = append_caracter(head, caracter);
 		word += offset;
@@ -104,7 +105,7 @@ position append_brother(position head, char caracter) {
 	tmp->next_brother = NULL;
 	tmp->next_child = NULL;
 	tmp->caracter = caracter;
-	
+
 	if (head->next_child->caracter > caracter) {
 		tmp->next_brother = head->next_child;
 		head->next_child = tmp;
@@ -125,7 +126,7 @@ position append_brother(position head, char caracter) {
 			return head;
 		}
 	}
-	
+
 }
 
 
@@ -136,7 +137,7 @@ position create_child(position head, char caracter) {
 
 	tmp->caracter = caracter;
 	head->next_child = tmp;
-	
+
 	return head->next_child;
 }
 
@@ -148,7 +149,7 @@ void display_directory_main(position head, int offset) {
 		for (i = 0; i < offset; i++) {
 			printf("  ");
 		}
-		
+
 		printf("-%c \n", tmp->caracter);
 
 		if (tmp->next_child != NULL)
@@ -168,7 +169,6 @@ int compare(position head) {
 	source = (char*)malloc(BUFFER * sizeof(char));
 	char caracter = NULL;
 	int offset = 0;
-	int action = 1;
 
 	printf("Unesite rijec za usporedbu: ");
 	scanf(" %s", source);
@@ -178,14 +178,32 @@ int compare(position head) {
 
 	while (offset != 0) {
 		source += offset;
-		
+		offset = 0;
 
+		while (tmp != NULL && tmp->caracter != caracter) {
+			tmp = tmp->next_brother;
+		}
 
-
-
-
-
-
+		if (tmp == NULL) {
+			return NULL;
+		}
+		else {
+			if (tmp->next_child != NULL) {
+				tmp = tmp->next_child;
+			}
+			else {
+				sscanf(source, " %c%n", &caracter, &offset);
+				if (offset != 0) {
+					return NULL;
+				}
+				break;
+			}
+		}
 		sscanf(source, " %c%n", &caracter, &offset);
 	}
+
+	if (tmp->type == 1)
+		return tmp->sentiment;
+	else
+		return NULL;
 }
