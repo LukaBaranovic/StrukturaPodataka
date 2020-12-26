@@ -225,7 +225,6 @@ void calculate_sentiment(position head) {
 	while (offset != 0) {
 		sentiment =sentiment + compare(head->next_child, source);
 
-		printf("  _%s_  \n", word);
 		source += offset;
 		offset = 0;
 		sscanf(source, " %s %n", word, &offset);
