@@ -171,13 +171,6 @@ int compare(position head,char *source) {
 
 	sscanf(source, " %c%n", &caracter, &offset);
 
-	if (caracter == '.' || caracter == ' ') {
-		source += offset;
-		offset = 0;
-		sscanf(source, " %c%n", &caracter, &offset);
-	}
-	
-
 	while (offset != 0) {
 		source += offset;
 		offset = 0;
@@ -191,7 +184,6 @@ int compare(position head,char *source) {
 		while (tmp != NULL && tmp->caracter != caracter) {
 			tmp = tmp->next_brother;
 		}
-
 		if (tmp == NULL) {
 			return NULL;
 		}
@@ -207,13 +199,9 @@ int compare(position head,char *source) {
 				break;
 			}
 		}
+
 		sscanf(source, " %c%n", &caracter, &offset);
 
-		if (caracter == '.' || caracter == ' ') {
-			source += offset;
-			offset = 0;
-			sscanf(source, " %c%n", &caracter, &offset);
-		}
 	}
 	printf(" %d", tmp->sentiment);
 
