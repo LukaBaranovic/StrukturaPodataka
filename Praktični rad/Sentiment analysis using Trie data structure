@@ -22,6 +22,8 @@ position append_caracter(position, char);
 position create_child(position, char);
 position append_brother(position, char);
 int compare(position);
+void calculate_sentiment(position head);
+
 
 int main() {
 	position trie = (position)malloc(sizeof(struct Node));
@@ -29,9 +31,8 @@ int main() {
 	trie->next_child = NULL;
 
 	read_from_file(trie);
-	printf(" Sentiment je: %d \n", compare(trie->next_child));
-	printf(" Sentiment je: %d \n", compare(trie->next_child));
-	printf(" Sentiment je: %d \n", compare(trie->next_child));
+
+	calculate_sentiment(trie);
 
 }
 
@@ -129,7 +130,6 @@ position append_brother(position head, char caracter) {
 
 }
 
-
 position create_child(position head, char caracter) {
 	position tmp = (position)malloc(sizeof(struct Node));
 	tmp->next_brother = NULL;
@@ -163,20 +163,28 @@ void display_directory_main(position head, int offset) {
 	}
 }
 
-int compare(position head) {
+int compare(position head,char *source) {
 	position tmp = head;
-	char* source = NULL;
-	source = (char*)malloc(BUFFER * sizeof(char));
 	char caracter = NULL;
 	int offset = 0;
-
-	printf("Unesite rijec za usporedbu: ");
-	scanf(" %s", source);
 
 
 	sscanf(source, " %c%n", &caracter, &offset);
 
+	if (caracter == '.' || caracter == ' ') {
+		source += offset;
+		offset = 0;
+		sscanf(source, " %c%n", &caracter, &offset);
+	}
+	
+
 	while (offset != 0) {
+		source += offset;
+		offset = 0;
+
+		printf("__%c__%d  ", caracter, tmp->sentiment);
+
+
 		source += offset;
 		offset = 0;
 
@@ -200,10 +208,39 @@ int compare(position head) {
 			}
 		}
 		sscanf(source, " %c%n", &caracter, &offset);
+
+		if (caracter == '.' || caracter == ' ') {
+			source += offset;
+			offset = 0;
+			sscanf(source, " %c%n", &caracter, &offset);
+		}
 	}
+	printf(" %d", tmp->sentiment);
 
 	if (tmp->type == 1)
 		return tmp->sentiment;
 	else
 		return NULL;
+}
+
+void calculate_sentiment(position head) {
+	int sentiment = 0;
+	int offset = 0;
+	char* source = NULL;
+	source = (char*)malloc(BUFFER * sizeof(char));
+	char* word = NULL;
+	word = (char*)malloc(BUFFER * sizeof(char));
+
+	scanf(" %[^\n]", source);
+
+	sscanf(source, " %s  %n", word,  &offset);
+	while (offset != 0) {
+		sentiment =sentiment + compare(head->next_child, source);
+
+		printf("  _%s_  \n", word);
+		source += offset;
+		offset = 0;
+		sscanf(source, " %s %n", word, &offset);
+	}
+	printf(" Sentiment recenice je: %d \n", sentiment);
 }
