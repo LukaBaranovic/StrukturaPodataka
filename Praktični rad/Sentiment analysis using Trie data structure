@@ -1,3 +1,13 @@
+/*
+RECENICA SE UNOSI TRENTUNO BEZ INTERPUNKCIJSKIH ZNAOKOVA SA SVIM MALIM SLOVINMA!!!
+
+U datoteci predifiniramo vrijednost sentimenta odredenih rijeci koji program iscitaje i sprema u 'Trie'.
+Zatim nas program pita da unesemo recenicu iz koje racuna vrijednost sentimenta s obzirom na rijeci.
+Vrijednosti mogu bit pozitivne (+) za pozitvne rijeci, negativne (-) za negativne rijeci, a neutralne (0)
+za sve rijeci koje nisu predifinirane u datoteci.
+*/
+
+
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <string.h>
@@ -47,21 +57,16 @@ void read_from_file(position head) {
 	if (fp == NULL)
 		printf("Eror reading file");
 
-
 	int offset = 0;
 	int  sentiment = 0;
-
 
 	while (!feof(fp)) {
 		fgets(source, BUFFER, fp);
 
-
 		sscanf(source, " %s %d %n", word, &sentiment, &offset);
 		while (offset != 0) {
-
 			append_word(head, word, sentiment);
-
-			printf(" %s - %d \n", word, sentiment);
+			printf(" %s : %d \n", word, sentiment);
 			source += offset;
 			offset = 0;
 			sscanf(source, " %s %d %n", word, &sentiment, &offset);
@@ -70,6 +75,14 @@ void read_from_file(position head) {
 	}
 	printf("\n");
 }
+
+/*
+Funkcija: read_from_file
+Funkcija cita iz datoteke rijeci i vrijednosti njihovih sentimenta sprema u strukturu 'Trie' 
+po abecednom redu. Program vadi rijeci i sentiment jedno po jedno i salje u drugu funkciju 'append_word'
+za daljnu obradu.
+Return: /
+*/
 
 void append_word(position head, char* word, int sentiment) {
 	char caracter;
@@ -92,6 +105,15 @@ void append_word(position head, char* word, int sentiment) {
 	head->type = 1;
 }
 
+/*
+Funckija: append_word , 
+pomocna funkcija funkcije read_from_file
+Funckija prima rijec i sentiment te razdvaja rijec na slova te ih salje u drugu funkciju za spremanje
+rijeci u strukturu 'Trie' slovo po slovo. Kada se dodje na kraj rijeci, sprema se sentiment na zadnje mjesto 
+i njegov tip (1 za kraj recenice),
+Return: /
+*/
+
 position append_caracter(position head, char caracter) {
 	if (head->next_child == NULL)
 		head = create_child(head, caracter);
@@ -100,6 +122,14 @@ position append_caracter(position head, char caracter) {
 
 	return head;
 }
+
+/*
+Funkcija: append_caracter ,
+pomocna funkcija funkcije append_word
+Funkcija prima slovo i ovisno o vrijednosti 'child' salje na daljnu obradu slovo u funciju 'create_child'
+ili 'append_brother'. Pokazivac head se postavlja na mjesto gdje smo stavili rijec.
+Return: position
+*/
 
 position append_brother(position head, char caracter) {
 	position tmp = (position)malloc(sizeof(struct Node));
@@ -127,8 +157,14 @@ position append_brother(position head, char caracter) {
 			return head;
 		}
 	}
-
 }
+
+/*
+Funckija: append_brother ,
+pomocna funkcija funkcije append_caracter
+Funkcija postavlja slovo abecedno u 'siblings'.
+Return: position
+*/
 
 position create_child(position head, char caracter) {
 	position tmp = (position)malloc(sizeof(struct Node));
@@ -140,6 +176,13 @@ position create_child(position head, char caracter) {
 
 	return head->next_child;
 }
+
+/*
+Funkcija: create_child ,
+pomocna funkcija funkcije append_caracter
+AKo je 'child' prazan on ga kreira i postavlja slovo na prvo mijesto.
+Return: position
+*/
 
 void display_directory_main(position head, int offset) {
 	position tmp = head;
@@ -163,6 +206,12 @@ void display_directory_main(position head, int offset) {
 	}
 }
 
+/*
+Funckija: display_directory_main
+Jedna od funkcija iz zadatka 8 koja mi je olaksala vizualizirati slova pri upisu.
+Nema svrhe u ovom programu,
+*/
+
 int compare(position head,char *source) {
 	position tmp = head;
 	char caracter = NULL;
@@ -172,12 +221,6 @@ int compare(position head,char *source) {
 	sscanf(source, " %c%n", &caracter, &offset);
 
 	while (offset != 0) {
-		source += offset;
-		offset = 0;
-
-		printf("__%c__%d  ", caracter, tmp->sentiment);
-
-
 		source += offset;
 		offset = 0;
 
@@ -199,17 +242,22 @@ int compare(position head,char *source) {
 				break;
 			}
 		}
-
 		sscanf(source, " %c%n", &caracter, &offset);
-
 	}
-	printf(" %d", tmp->sentiment);
 
 	if (tmp->type == 1)
 		return tmp->sentiment;
 	else
 		return NULL;
 }
+
+/*
+Funcija: compare
+Funckija usporeduje neku rijec sa podaticima u strukturi Trie tako sto uzima slovo po slovo i tako
+seta po strukturi Trie trazeci je li ta rijec upisana. Ako je onda vraca vrijednost sentimenta, a ako
+nije vraca NULL.
+Return: int
+*/
 
 void calculate_sentiment(position head) {
 	int sentiment = 0;
@@ -223,11 +271,17 @@ void calculate_sentiment(position head) {
 
 	sscanf(source, " %s  %n", word,  &offset);
 	while (offset != 0) {
-		sentiment =sentiment + compare(head->next_child, source);
-
+		sentiment = sentiment + compare(head->next_child, word);
 		source += offset;
 		offset = 0;
 		sscanf(source, " %s %n", word, &offset);
 	}
 	printf(" Sentiment recenice je: %d \n", sentiment);
 }
+
+/*
+Funkcija: calculate_sentiment
+Funckija nas pita za unos recenice te potom razdvaja rijeci iz receneice i koristeci funkciju 'compare'
+dobivamo sentimentalnu vrijednost svake rijeci i funkcija ispisuje zbroj.
+Return: /
+*/
