@@ -1,5 +1,5 @@
 /*
-RECENICA SE UNOSI TRENTUNO BEZ INTERPUNKCIJSKIH ZNAOKOVA SA SVIM MALIM SLOVINMA!!!
+U RECENICAMA/RIJECIMA SE MOGU KORISTITI I VELIKA I MALA SLOVA I INTERPUNKCIJSKI ZNAKOVI
 
 U datoteci predifiniramo vrijednost sentimenta odredenih rijeci koji program iscitaje i sprema u 'Trie'.
 Zatim nas program pita da unesemo recenicu iz koje racuna vrijednost sentimenta s obzirom na rijeci.
@@ -34,17 +34,39 @@ position create_child(position, char);
 position append_brother(position, char);
 int compare(position);
 void calculate_sentiment(position head);
+void delete_all(position);
 
 
 int main() {
 	position trie = (position)malloc(sizeof(struct Node));
 	trie->next_brother = NULL;
 	trie->next_child = NULL;
+	int loop = 1;
+	int action = 0;
 
 	read_from_file(trie);
 
-	calculate_sentiment(trie);
+	printf("(1) Unesi recenicu na procjenu sentimenta \n");
+	printf("(0) Izadji iz programa \n");
 
+	while (loop == 1) {
+		scanf("%d", &action);
+
+		switch (action) {
+		case 1:
+			printf("Unesite recenicu za procjenu sentimenta:  ");
+			calculate_sentiment(trie);
+			break;
+		case 0:
+			loop = 0;
+			break;
+		default:
+			loop = 0;
+			break;
+		}
+	}
+
+	delete_all(trie);
 }
 
 
@@ -56,7 +78,7 @@ void read_from_file(position head) {
 	word = (char*)malloc(BUFFER * sizeof(char));
 
 	if (fp == NULL) {
-		printf("Eror reading file");
+		printf("Eror reading file!! ");
 		return NULL;
 	}
 
@@ -92,8 +114,12 @@ void append_word(position head, char* word, int sentiment) {
 	int type = 0;
 	int offset = 0;
 
-	sscanf(word, " %c%n", &caracter, &offset);
+	if (NULL == word) {
+		printf("Eror appending word! \n");
+		return NULL;
+	}
 
+	sscanf(word, " %c%n", &caracter, &offset);
 	while (offset != 0) {
 		head = append_caracter(head, caracter);
 		word += offset;
@@ -109,7 +135,7 @@ void append_word(position head, char* word, int sentiment) {
 }
 
 /*
-Funckija: append_word , 
+Funckija: append_word 
 pomocna funkcija funkcije read_from_file
 Funckija prima rijec i sentiment te razdvaja rijec na slova te ih salje u drugu funkciju za spremanje
 rijeci u strukturu 'Trie' slovo po slovo. Kada se dodje na kraj rijeci, sprema se sentiment na zadnje mjesto 
@@ -127,7 +153,7 @@ position append_caracter(position head, char caracter) {
 }
 
 /*
-Funkcija: append_caracter ,
+Funkcija: append_caracter 
 pomocna funkcija funkcije append_word
 Funkcija prima slovo i ovisno o vrijednosti 'child' salje na daljnu obradu slovo u funciju 'create_child'
 ili 'append_brother'. Pokazivac head se postavlja na mjesto gdje smo stavili rijec.
@@ -163,7 +189,7 @@ position append_brother(position head, char caracter) {
 }
 
 /*
-Funckija: append_brother ,
+Funckija: append_brother 
 pomocna funkcija funkcije append_caracter
 Funkcija postavlja slovo abecedno u 'siblings'.
 Return: position
@@ -181,9 +207,9 @@ position create_child(position head, char caracter) {
 }
 
 /*
-Funkcija: create_child ,
+Funkcija: create_child 
 pomocna funkcija funkcije append_caracter
-AKo je 'child' prazan on ga kreira i postavlja slovo na prvo mijesto.
+Ako je 'child' prazan on ga kreira i postavlja slovo na prvo mijesto.
 Return: position
 */
 
@@ -215,16 +241,22 @@ Nema svrhe u ovom programu,
 int compare(position head,char *source) {
 	position tmp = head;
 	char caracter = NULL;
+	char checker = NULL;
 	int offset = 0;
+	int sentiment = 0;
 
 
 	sscanf(source, " %c%n", &caracter, &offset);
+	while (caracter == '.' || caracter == ',' || caracter == '!' || caracter == ';' || caracter == ':') {
+		source += offset;
+		sscanf(source, " %c%n", &caracter, &offset);
+	}
 
 	while (offset != 0) {
 		source += offset;
 		offset = 0;
 
-		while (tmp != NULL && tmp->caracter != caracter) {
+		while (tmp != NULL && toupper(tmp->caracter) != toupper(caracter)) {
 			tmp = tmp->next_brother;
 		}
 		if (tmp == NULL) {
@@ -242,7 +274,20 @@ int compare(position head,char *source) {
 				break;
 			}
 		}
+
 		sscanf(source, " %c%n", &caracter, &offset);
+
+		if (tmp->isEndOfWord == true) {
+			sentiment = tmp->sentiment;
+		}
+		if (sentiment != 0) {
+			sscanf(source + offset, "%c", &checker);
+			if (checker == '.' || checker == ',' || checker == ';' || checker == ':' || checker == '!' || checker == '?') {
+				return sentiment;
+			}
+			else
+				sentiment = 0;
+		}
 	}
 
 	if (tmp->isEndOfWord == true)
@@ -285,3 +330,12 @@ Funckija nas pita za unos recenice te potom razdvaja rijeci iz receneice i koris
 dobivamo sentimentalnu vrijednost svake rijeci i funkcija ispisuje zbroj.
 Return: /
 */
+
+
+void delete_all(position head) {
+	if (head == NULL)
+		return;
+	delete_all(head->next_brother);
+	delete_all(head->next_child);
+	free(head);
+}
