@@ -11,6 +11,7 @@ za sve rijeci koje nisu predifinirane u datoteci.
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #define BUFFER 256
 
 
@@ -18,7 +19,7 @@ typedef struct Node* position;
 struct Node {
 	char caracter;
 	int sentiment;
-	int type;
+	bool isEndOfWord; 
 	position next_brother;
 	position next_child;
 };
@@ -54,8 +55,10 @@ void read_from_file(position head) {
 	char* word = NULL;
 	word = (char*)malloc(BUFFER * sizeof(char));
 
-	if (fp == NULL)
+	if (fp == NULL) {
 		printf("Eror reading file");
+		return NULL;
+	}
 
 	int offset = 0;
 	int  sentiment = 0;
@@ -102,7 +105,7 @@ void append_word(position head, char* word, int sentiment) {
 	word += offset;
 
 	head->sentiment = sentiment;
-	head->type = 1;
+	head->isEndOfWord = true;
 }
 
 /*
@@ -192,16 +195,13 @@ void display_directory_main(position head, int offset) {
 		for (i = 0; i < offset; i++) {
 			printf("  ");
 		}
-
 		printf("-%c \n", tmp->caracter);
-
 		if (tmp->next_child != NULL)
 			display_directory_main(tmp->next_child, offset + 1);
 
-		if (tmp->type == 1) {
+		if (tmp->isEndOfWord == true) {
 			printf("Kraj rijeci!, sentiment: %d \n", tmp->sentiment);
 		}
-
 		tmp = tmp->next_brother;
 	}
 }
@@ -245,7 +245,7 @@ int compare(position head,char *source) {
 		sscanf(source, " %c%n", &caracter, &offset);
 	}
 
-	if (tmp->type == 1)
+	if (tmp->isEndOfWord == true)
 		return tmp->sentiment;
 	else
 		return NULL;
