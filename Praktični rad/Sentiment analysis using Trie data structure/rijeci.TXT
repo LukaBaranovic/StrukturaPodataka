@@ -1,0 +1,4 @@
+dobar 1
+los -1 
+odlican 1
+ocajan -2
