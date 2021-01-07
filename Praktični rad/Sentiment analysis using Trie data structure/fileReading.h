@@ -3,7 +3,6 @@ Header file za citanje iz datoteke.
 */
 
 #pragma once
-
 #include <stdio.h>
 #include "declaration.h"
 
