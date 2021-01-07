@@ -18,6 +18,11 @@ Return: /
 
 void run_program() {
 	position trie = (position)malloc(sizeof(struct Node));
+	if (trie == NULL) {
+		printf("malloc failed in: run_program !!");
+		return;
+	}
+
 	trie->next_brother = NULL;
 	trie->next_child = NULL;
 	int loop = 1;
@@ -46,4 +51,11 @@ void run_program() {
 		}
 	}
 	delete_all(trie);
+}
+
+position initialize() {
+	position new = (position)malloc(sizeof(struct Node));
+	new->next_brother = NULL;
+	new->next_child = NULL;
+	return new;
 }
