@@ -7,6 +7,7 @@ Source file koji racuna vrijednost senitmenta neke rijeci.
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <math.h>
 #include "getSentiment.h"
 #include "declaration.h"
 #define BUFFER 256
@@ -21,6 +22,32 @@ nije vraca NULL.
 Return: int
 */
 
+char* is_interpunction_first(char* source) {
+	char caracter;
+	int offset = 0;
+	sscanf(source, " %c%n", &caracter, &offset);
+	if (caracter == '.' || caracter == ',' || caracter == '!' || caracter == ';' || caracter == ':') {
+		source += offset;
+	}
+	return source;
+}
+
+bool is_interpunction_last(position tmp, int offset, char* source) {
+	char caracter = NULL;
+	if (tmp->isEndOfWord == true) {
+		int sentiment = tmp->sentiment;
+		sscanf(source + offset, "%c", &caracter);
+		if (caracter == '.' || caracter == ',' || caracter == ';' || caracter == ':' || caracter == '!' || caracter == '?') {
+			return true;
+		}
+		else
+			return false;
+	}
+	return false;
+}
+
+
+
 int compare(position head, char* source) {
 	position tmp = head;
 	char caracter = NULL;
@@ -28,12 +55,8 @@ int compare(position head, char* source) {
 	int offset = 0;
 	int sentiment = 0;
 
-
+	source = is_interpunction_first(source);
 	sscanf(source, " %c%n", &caracter, &offset);
-	while (caracter == '.' || caracter == ',' || caracter == '!' || caracter == ';' || caracter == ':') {
-		source += offset;
-		sscanf(source, " %c%n", &caracter, &offset);
-	}
 
 	while (offset != 0) {
 		source += offset;
@@ -57,27 +80,17 @@ int compare(position head, char* source) {
 				break;
 			}
 		}
-
 		sscanf(source, " %c%n", &caracter, &offset);
-
-		if (tmp->isEndOfWord == true) {
-			sentiment = tmp->sentiment;
-		}
-		if (sentiment != 0) {
-			sscanf(source + offset, "%c", &checker);
-			if (checker == '.' || checker == ',' || checker == ';' || checker == ':' || checker == '!' || checker == '?') {
-				return sentiment;
-			}
-			else
-				sentiment = 0;
-		}
+		if (is_interpunction_last(tmp, offset, source) == true)
+			return tmp->sentiment;
 	}
-
 	if (tmp->isEndOfWord == true)
 		return tmp->sentiment;
 	else
-		return NULL;
+		return 0;
 }
+
+
 
 /*
 Funkcija: calculate_sentiment
@@ -94,6 +107,10 @@ void calculate_sentiment(position head) {
 	source = (char*)malloc(BUFFER * sizeof(char));
 	char* word = NULL;
 	word = (char*)malloc(BUFFER * sizeof(char));
+	if (source == NULL || word == NULL) {
+		printf("malloc failed in: calculate_sentiment");
+		return;
+	}
 
 	scanf(" %[^\n]", source);
 
@@ -104,5 +121,13 @@ void calculate_sentiment(position head) {
 		offset = 0;
 		sscanf(source, " %s %n", word, &offset);
 	}
-	printf(" Sentiment recenice je: %d \n", sentiment);
+	printf(" Sentiment recenice je: %lf \n", sigmoid(sentiment));
+}
+
+float sigmoid(int sentiment) {
+	float result;
+	float e = 2.71828;
+
+	result = 1 / (1 + pow(e, -sentiment));
+	return result;
 }
