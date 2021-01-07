@@ -2,7 +2,6 @@
 Source file za citanje rijeci iz datoteke te razdvajanje na slova i slanje na unos u trie strukturu.
 */
 
-
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <string.h>
@@ -10,8 +9,6 @@ Source file za citanje rijeci iz datoteke te razdvajanje na slova i slanje na un
 #include "fileReading.h"
 #include "declaration.h"
 #define BUFFER 256
-
-
 
 /*
 Funkcija: read_from_file
@@ -27,7 +24,13 @@ void read_from_file(position head) {
 	source = (char*)malloc(BUFFER * sizeof(char));
 	char* word = NULL;
 	word = (char*)malloc(BUFFER * sizeof(char));
+	int offset = 0;
+	int  sentiment = 0;
 
+	if (source == NULL || word == NULL) {
+		printf("malloc failed in: read_from_file !");
+		return;
+	}
 	if (fp == NULL) {
 		printf("Eror reading file!! ");
 		return NULL;
@@ -35,12 +38,8 @@ void read_from_file(position head) {
 
 	printf("Rijeci sa sentimentom: \n");
 
-	int offset = 0;
-	int  sentiment = 0;
-
 	while (!feof(fp)) {
 		fgets(source, BUFFER, fp);
-
 		sscanf(source, " %s %d %n", word, &sentiment, &offset);
 		while (offset != 0) {
 			append_word(head, word, sentiment);
@@ -49,7 +48,6 @@ void read_from_file(position head) {
 			offset = 0;
 			sscanf(source, " %s %d %n", word, &sentiment, &offset);
 		}
-
 	}
 	printf("\n");
 }
@@ -85,8 +83,13 @@ void append_word(position head, char* word, int sentiment) {
 	sscanf(word, " %d%n", &type, &offset);
 	word += offset;
 
-	head->sentiment = sentiment;
-	head->isEndOfWord = true;
+	if (sentiment > 1 || sentiment < -1) {
+		printf("Eror reading sentiment!! It must be in range <-1,1> and will not be included in trie:  ");
+	}
+	else {
+		head->sentiment = sentiment;
+		head->isEndOfWord = true;
+	}
 }
 
 
