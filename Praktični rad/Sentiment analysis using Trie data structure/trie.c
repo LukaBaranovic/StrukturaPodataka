@@ -19,9 +19,11 @@ Return: position
 */
 
 position append_brother(position head, char caracter) {
-	position tmp = (position)malloc(sizeof(struct Node));
-	tmp->next_brother = NULL;
-	tmp->next_child = NULL;
+	position tmp = initialize();
+	if (tmp == NULL) {
+		printf("malloc failed in: append_brother");
+		return NULL; 
+	}
 	tmp->caracter = caracter;
 
 	if (head->next_child->caracter > caracter) {
@@ -54,9 +56,11 @@ Return: position
 */
 
 position create_child(position head, char caracter) {
-	position tmp = (position)malloc(sizeof(struct Node));
-	tmp->next_brother = NULL;
-	tmp->next_child = NULL;
+	position tmp = initialize();
+	if (tmp == NULL) {
+		printf("malloc failed in: append_brother");
+		return NULL;
+	}
 
 	tmp->caracter = caracter;
 	head->next_child = tmp;
