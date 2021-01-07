@@ -21,4 +21,6 @@ struct Node {
 };
 
 void run_program();
+position initialize();
+
 
