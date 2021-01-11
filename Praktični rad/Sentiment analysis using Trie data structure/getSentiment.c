@@ -2,7 +2,6 @@
 Source file koji racuna vrijednost senitmenta neke rijeci.
 */
 
-
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <string.h>
@@ -12,14 +11,10 @@ Source file koji racuna vrijednost senitmenta neke rijeci.
 #include "declaration.h"
 #define BUFFER 256
 
-
-
 /*
-Funcija: compare
-Funckija usporeduje neku rijec sa podaticima u strukturi Trie tako sto uzima slovo po slovo i tako
-seta po strukturi Trie trazeci je li ta rijec upisana. Ako je onda vraca vrijednost sentimenta, a ako
-nije vraca NULL.
-Return: int
+Funkcija: is_interpunction_last
+Provjerava je li se nalazi interpunkcijski znak na pocetku rijeci, a ako je mice ga za offset (%n).
+Return: char*
 */
 
 char* is_interpunction_first(char* source) {
@@ -31,6 +26,13 @@ char* is_interpunction_first(char* source) {
 	}
 	return source;
 }
+
+/*
+Funkcija: is_interpunction_last
+Provjerava je li se interpunkcijski znak nalazi na kraju rijeci. Morao sam razdvojiti funkcije zbog toga jer kod nastavlja 'setati'
+po rijeci i ako prijedje na interpunkcijski znak onda nema sentiment za vratiti, tj bool == false.
+Return: bool
+*/
 
 bool is_interpunction_last(position tmp, int offset, char* source) {
 	char caracter = NULL;
@@ -46,7 +48,13 @@ bool is_interpunction_last(position tmp, int offset, char* source) {
 	return false;
 }
 
-
+/*
+Funcija: compare
+Funckija usporeduje neku rijec sa podaticima u strukturi Trie tako sto uzima slovo po slovo i tako
+seta po strukturi Trie trazeci je li ta rijec upisana. Ako je onda vraca vrijednost sentimenta, a ako
+nije vraca NULL.
+Return: int
+*/
 
 int compare(position head, char* source) {
 	position tmp = head;
@@ -61,36 +69,26 @@ int compare(position head, char* source) {
 	while (offset != 0) {
 		source += offset;
 		offset = 0;
-
 		while (tmp != NULL && toupper(tmp->caracter) != toupper(caracter)) {
 			tmp = tmp->next_brother;
-		}
-		if (tmp == NULL) {
+		}  if (tmp == NULL) {
 			return NULL;
-		}
-		else {
+		}	else {
 			if (tmp->next_child != NULL) {
 				tmp = tmp->next_child;
-			}
-			else {
+			}		else {
 				sscanf(source, " %c%n", &caracter, &offset);
 				if (offset != 0) {
-					return NULL;
-				}
+					return NULL;	}
 				break;
 			}
 		}
 		sscanf(source, " %c%n", &caracter, &offset);
-		if (is_interpunction_last(tmp, offset, source) == true)
-			return tmp->sentiment;
+		if (is_interpunction_last(tmp, offset, source) == true)		return tmp->sentiment;
 	}
-	if (tmp->isEndOfWord == true)
-		return tmp->sentiment;
-	else
-		return 0;
+	if (tmp->isEndOfWord == true)	return tmp->sentiment;
+	else   return 0;
 }
-
-
 
 /*
 Funkcija: calculate_sentiment
@@ -114,6 +112,8 @@ void calculate_sentiment(position head) {
 
 	scanf(" %[^\n]", source);
 
+	printf("\n Sentence '%s' \n has sentiment evaluation of:  ", source);
+
 	sscanf(source, " %s  %n", word, &offset);
 	while (offset != 0) {
 		sentiment = sentiment + compare(head->next_child, word);
@@ -121,8 +121,15 @@ void calculate_sentiment(position head) {
 		offset = 0;
 		sscanf(source, " %s %n", word, &offset);
 	}
-	printf(" Sentiment recenice je: %lf \n", sigmoid(sentiment));
+	printf("%lf \n\n", sigmoid(sentiment));
 }
+
+/*
+Funkcija: sigmoid
+Racuna sigmoid sentimenta 
+1 / (1 + e^(sentiment)
+Return: float
+*/
 
 float sigmoid(int sentiment) {
 	float result;
