@@ -17,23 +17,20 @@ Return: /
 
 
 void run_program() {
-	position trie = (position)malloc(sizeof(struct Node));
+	position trie = initialize();
 	if (trie == NULL) {
 		printf("malloc failed in: run_program !!");
 		return;
 	}
-
-	trie->next_brother = NULL;
-	trie->next_child = NULL;
 	int loop = 1;
 	int action = 0;
 
 	read_from_file(trie);
 
-	printf("(1) Unesi recenicu na procjenu sentimenta \n");
-	printf("(0) Izadji iz programa \n");
-
 	while (loop == 1) {
+		printf("(1) Insert an sentence for sentiment evaluation \n");
+		printf("(0) Exit  \n");
+		printf("Chose an action: ");
 		scanf("%d", &action);
 
 		switch (action) {
@@ -52,6 +49,12 @@ void run_program() {
 	}
 	delete_all(trie);
 }
+
+/*
+Funkcija: initialize
+Inicijalizira novu listu
+Return: position
+*/
 
 position initialize() {
 	position new = (position)malloc(sizeof(struct Node));
