@@ -1,4 +1,4 @@
-/*
+ /*
 Source file koji postavlja slovo na odredeno mjesto.
 */
 
@@ -9,7 +9,6 @@ Source file koji postavlja slovo na odredeno mjesto.
 #include "fileReading.h"
 #include "declaration.h"
 #define BUFFER 256
-
 
 /*
 Funckija: append_brother
@@ -61,7 +60,6 @@ position create_child(position head, char caracter) {
 		printf("malloc failed in: append_brother");
 		return NULL;
 	}
-
 	tmp->caracter = caracter;
 	head->next_child = tmp;
 
