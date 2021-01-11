@@ -1,4 +1,16 @@
 dobar 1
-los -1 
+bolje 1
+bolji 1
+najbolji 1
+los -1
+lose -1 
+losije -1 
+najlosije -1
 odlican 1
 ocajan -2
+slab -1 
+slabo -3 
+jak 1
+prelose -1 
+grozno -1 
+sjajno 4
