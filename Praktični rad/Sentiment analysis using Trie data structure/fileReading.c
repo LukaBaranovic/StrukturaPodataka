@@ -36,7 +36,7 @@ void read_from_file(position head) {
 		return NULL;
 	}
 
-	printf("Rijeci sa sentimentom: \n");
+	printf("Words and their sentiment value: \n");
 
 	while (!feof(fp)) {
 		fgets(source, BUFFER, fp);
@@ -92,7 +92,6 @@ void append_word(position head, char* word, int sentiment) {
 	}
 }
 
-
 /*
 Funkcija: append_caracter
 pomocna funkcija funkcije append_word
@@ -110,6 +109,11 @@ position append_caracter(position head, char caracter) {
 	return head;
 }
 
+/*
+Funkcija: delete_all
+Brise cijelu trie strukturu
+Return:/
+*/
 
 void delete_all(position head) {
 	if (head == NULL)
