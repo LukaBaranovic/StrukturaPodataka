@@ -3,13 +3,11 @@ Header file, (glavni) koji inicijalizira strukturu te sadrzi funkciju za pokreta
 */
 
 #pragma once
-
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-
 
 typedef struct Node* position;
 struct Node {
@@ -22,5 +20,3 @@ struct Node {
 
 void run_program();
 position initialize();
-
-
