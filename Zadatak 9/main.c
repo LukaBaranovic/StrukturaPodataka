@@ -1,44 +1,77 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
-
+#include <string.h>
 
 typedef struct Node* position;
+
 struct Node {
-	int value;
-	position left, rigth;
+	int Number;
+	position Left, Right;
 };
 
 position initialize();
-position appendNew(position);
-position append(position, int);
-
-void display(position, int);
 void displayOptions();
 void printDifference(int);
-void start();
-void doOption(position);
-
-
-void searchSpecific(position);
-bool search(position, int);
-
-position findMin(position);
-position findMax(position);
-
-void deleteSpecific(position);
-position delete(position, int);
+position appendNew(position);
+position append(position, int);
+void search(position);
 position find(position, int);
+position findMinimum(position);
+position findMaximum(position);
+void deleteAll(position);
+void display(position, int);
+void doOption(position);
+position deleteSpecific(position);
+position delete(position, int);
+void start();
 
 
-void main(){
+int main() {
 	start();
 }
 
 
+void start() {
+	position main = initialize();
+	doOption(main);
+}
+
+position delete(position head, int number) {
+	if (head == NULL) return NULL;
+	if (head->Number < number)
+		head->Right = delete(head->Right, number);
+	else
+		head->Left = delete(head->Left, number);
+	if (head->Number == number) {
+		if (head->Right == NULL) {
+			position tmp = head->Left;
+			free(head);
+			return tmp;
+		}
+		else if (head->Left == NULL) {
+			position tmp = head->Right;
+			free(head);
+			return tmp;
+		}
+		else {
+			position tmp = findMinimum(head->Right);
+			head->Number = tmp->Number;
+			head->Right = delete(head->Right, tmp->Number);
+		}
+	}
+	return head;
+}
+
+position deleteSpecific(position head) {
+	int number = 0;
+	printf("Insert element to delete: ");
+	scanf(" %d", &number);
+	return delete(head, number);
+}
+
 void doOption(position head) {
-	int option, loop = 1;
+	int option = 0, loop = 1;
 
 	while (loop == 1) {
 		displayOptions();
@@ -50,10 +83,10 @@ void doOption(position head) {
 			head = appendNew(head);
 			break;
 		case 2:
-			display(head->rigth, 0);
+			display(head->Right, 0);
 			break;
 		case 3:
-			searchSpecific(head->rigth);
+			search(head->Right);
 			break;
 		case 4:
 			deleteSpecific(head);
@@ -67,6 +100,86 @@ void doOption(position head) {
 	}
 }
 
+
+void display(position head, int difference) {
+	if (head == NULL) return;
+	printf(" %d \n", head->Number);
+	if (NULL != head->Left) {
+		printDifference(difference);
+		printf("Left part:  ");
+		display(head->Left, difference + 2);
+	}
+	if (NULL != head->Right) {
+		printDifference(difference);
+		printf("Right part: ");
+		display(head->Right, difference + 2);
+	}
+}
+
+
+void deleteAll(position head) {
+	if (head == NULL) return 0;
+	deleteAll(head->Left);
+	deleteAll(head->Right);
+	free(head);
+}
+
+position findMinimum(position head) {
+	if (head->Left != NULL) return findMinimum(head->Left);
+	return head;
+}
+
+position findMaximum(position head) {
+	if (head->Right != NULL) return findMaximum(head->Right);
+	return head;
+}
+
+
+void search(position head) {
+	int number = 0;
+	printf("Insert a number to search for:  ");
+	scanf(" %d", &number);
+
+	if (find(head, number) == NULL)
+		printf("Element does not exist! \n");
+	else
+		printf("Element does exist! \n");
+}
+
+position find(position head, int number) {
+	if (head == NULL) return NULL;
+	if (head->Number == number) return head;
+	if (head->Right < number)
+		return find(head->Right, number);
+	else
+		return find(head->Left, number);
+	return head;
+}
+
+position append(position head, int number) {
+	if (NULL == head) {
+		head = initialize();
+		head->Number = number;
+		return head;
+	}
+	else {
+		if (head->Number == number)
+			return NULL;
+		else if (head->Number < number)
+			head->Right = append(head->Right, number);
+		else if (head->Number > number)
+			head->Left = append(head->Left, number);
+	}
+	return head;
+}
+
+position appendNew(position head) {
+	int number = 0;
+	printf("Insert new element: ");
+	scanf(" %d", &number);
+	return append(head, number);
+}
+
 void displayOptions() {
 	printf("(1) Insert element \n");
 	printf("(2) Display element/elements \n");
@@ -75,153 +188,20 @@ void displayOptions() {
 	printf("(0) Exit program \n");
 }
 
-void start() {
-	position binaryTree = initialize();
-	doOption(binaryTree);
-}
-
-
-position delete(position head,int number){
-	if (NULL == head) return;
-
-	if (head->value == number) {
-		if (NULL != head->left) {
-			position new = findMax(head->left);
-			head->value = new->value;
-			head->left = delete(head->left, new->value);
-		}
-		else if (NULL != head->rigth) {
-			position new = findMin(head->left);
-			head->value = new->value;
-			head->rigth = delete(head->rigth, new->value);
-		}
-		else {
-			free(head);
-			return NULL;
-		}
-	}
-}
-
-void deleteSpecific(position head) {
-	int number = 0;
-	printf("Insert number to delete: ");
-	scanf(" %d", &number);
-	if (search(head->rigth, number) == true) 
-		delete(find(head->rigth, number), number);
-	else
-		printf("Inserted element does not exist! \n");
-		
-}
-
-position findMin(position head) {
-	if (NULL == head) return NULL;
-	while (NULL != head->left)
-		head = head->left;
-	return head;
-}
-
-position findMax(position head){
-	if (NULL == head) return NULL;
-	while (NULL != head->rigth)
-		head = head->rigth;
-	return head;
-}
-
-
-void searchSpecific(position head) {
-	int number;
-	printf("Insert a number for search:  ");
-	scanf(" %d", &number);
-	if (search(head->rigth, number) == true)
-		printf("Element exists! \n");
-	else
-		printf("Element does not exist! \n");
-	return;
-}
-
-
-position find(position head, int number) {
-	if (NULL == head)
-		return NULL;
-	if (head->value == number)
-		return	head;
-	if (head->value < number)
-		find(head->rigth, number);
-	else
-		find(head->left, number);
-}
-
-bool search(position head, int number) {
-
-	if (NULL == head)
-		return false;
-	if (head->value == number)	
-		return	true;
-	if (head->value < number)	
-		search(head->rigth, number);
-	else    
-		search(head->left, number);
-}
-
-
-void display(position head, int difference) {
-	if (head == NULL) return;
-	printf(" %d \n", head->value);
-	if (NULL != head->left) {
-		printDifference(difference);
-		printf("Left part:  ");
-		display(head->left, difference + 2);
-	}
-	if (NULL != head->rigth) {
-		printDifference(difference);
-		printf("Right part: ");
-		display(head->rigth, difference + 2);
-	}
-}
-
-
-
-void printDifference(int n) {
-	int i;
-	for (i = 0; i < n; i++) {
-		printf(" ");
-	}
-}
-
-
-position appendNew(position head){
-	int value = 0;
-	printf("Insert value: ");
-	scanf(" %d", &value);
-	return append(head, value);
-}
-
-
-position append(position head, int value) {
-	if (head == NULL) {
-		head = initialize();
-		head->value = value;
-		return head;
-	}
-	else {
-		if (head->value < value)
-			head->rigth = append(head->rigth, value);
-		else if (head->value > value)
-			head->left = append(head->left, value);
-		else
-			return NULL;
-	}
-	return head;
-}
-
-
 position initialize() {
 	position new = (position)malloc(sizeof(struct Node));
 	if (new == NULL) {
 		printf("Malloc failed! \n");
 		return NULL;
 	}
-	new->left = NULL;
-	new->rigth = NULL;
+	new->Left = NULL;
+	new->Right = NULL;
 	return new;
+}
+
+void printDifference(int n) {
+	int i;
+	for (i = 0; i < n; i++) {
+		printf(" ");
+	}
 }
