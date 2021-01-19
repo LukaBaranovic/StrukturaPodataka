@@ -21,8 +21,12 @@ void pushNumber(position, int);
 void pushOperand(position, char);
 position popNumber(position);
 
+void infixToFile(position);
+void printToFile(position, FILE*);
+
 int main() {
 	position main = readFromFile();
+	infixToFile(main);
 }
 
 position initialize() {
@@ -105,4 +109,24 @@ position popNumber(position head) {
 	return tmp;
 }
 
+void infixToFile(position head) {
+	if (head == NULL) return;
+	FILE* fp = fopen("infix.txt", "w");
+	if (fp == NULL) return;
 
+	printToFile(head->Next, fp);
+
+	fclose(fp);
+}
+
+void printToFile(position head, FILE* fp) {
+	if (head == NULL) return;
+	printToFile(head->Left, fp);
+
+	if (isOperand(head->Operand))
+		fprintf(fp, " %c ", head->Operand);
+	else
+		fprintf(fp, " %d ", head->Number);
+
+	printToFile(head->Right, fp);
+}
